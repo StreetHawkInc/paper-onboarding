@@ -150,6 +150,14 @@
                                  multiplier:1.0f
                                  constant:-tip.carousel.margin.bottom];
     [viewContent addConstraint:bottom];
+    //first item doesn't trigger onboardingWillTransitonToIndex or onboardingDidTransitonToIndex.
+    //so send feed result when carousel display.
+    //next when swiping forward or backward, the delegates are triggered to send feed result.
+    [StreetHawk notifyFeedResult:tip.feed_id
+                      withResult:SHResult_Accept
+                      withStepId:tip.carousel.items.firstObject.suid //above check guaranteed
+                      deleteFeed:NO
+                       completed:NO];
 }
 
 #pragma mark - delegate and datasource
@@ -179,6 +187,12 @@
 
 - (void)onboardingWillTransitonToIndex:(NSInteger)index
 {
+    SHTipCarouselItem *tipItem = self.tipElement.carousel.items[index];
+    [StreetHawk notifyFeedResult:self.tipElement.feed_id
+                      withResult:SHResult_Accept
+                      withStepId:tipItem.suid //above check guaranteed
+                      deleteFeed:NO
+                       completed:NO];
 }
 
 - (void)onboardingDidTransitonToIndex:(NSInteger)index
