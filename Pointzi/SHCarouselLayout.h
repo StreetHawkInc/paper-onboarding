@@ -17,8 +17,6 @@
 
 #import <UIKit/UIKit.h>
 
-@class SHTipElement;
-
 @interface SHCarouselLayout : NSObject
 
 /**
@@ -29,6 +27,6 @@
 /**
  Layout carousel on a view content.
  */
-- (void)layoutCarouselOnView:(UIView *)viewContent forTip:(SHTipElement *)tip;
+- (void)layoutCarouselOnView:(UIView *)viewContent forTip:(NSDictionary *)dictCarousel;
 
 @end

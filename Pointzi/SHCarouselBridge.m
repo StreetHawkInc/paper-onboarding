@@ -21,7 +21,7 @@
 @interface SHCarouselBridge ()
 
 //for layout carousel in the given view.
-//notification name: SH_CarouselBridge_LayoutCarousel; user info: @{@"view": view_content, @"tip": tip}].
+//notification name: SH_CarouselBridge_LayoutCarousel; user info: @{@"view": view_content, @"tip": dictTip}].
 + (void)layoutCarouselHandler:(NSNotification *)notification;
 
 @end
@@ -39,9 +39,9 @@
 + (void)layoutCarouselHandler:(NSNotification *)notification
 {
     UIView *viewContent = notification.userInfo[@"view"]; //tip controller's content view
-    SHTipElement *tip = notification.userInfo[@"tip"];
+    NSDictionary *dictTip = notification.userInfo[@"tip"];
     [[SHCarouselLayout sharedInstance] layoutCarouselOnView:viewContent
-                                                     forTip:tip];
+                                                     forTip:dictTip];
 }
 
 @end
