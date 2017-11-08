@@ -16,14 +16,14 @@
  */
 
 #import "SHCarouselLayout.h"
-//header from StreetHawk
-#import "StreetHawkCore_Pointzi.h"
 //header from PaperOnboarding
 #import <PaperOnboarding/PaperOnboarding-Swift.h>
 
 @interface SHCarouselLayout () <PaperOnboardingDataSource, PaperOnboardingDelegate>
 
-@property (nonatomic, strong) SHTipElement *tipElement;
+@property (nonatomic, strong) NSDictionary *dictTip;
+
++ (UIColor *)colorFromHexString:(NSString *)hexString;
 
 @end
 
@@ -39,32 +39,61 @@
     return sharedInstance;
 }
 
-- (void)layoutCarouselOnView:(UIView *)viewContent forTip:(SHTipElement *)tip
+- (void)layoutCarouselOnView:(UIView *)viewContent forTip:(NSDictionary *)dictTip
 {
+    //not have any carousel to show
     if (viewContent == nil
-        || tip == nil
-        || tip.carousel.items.count == 0)
+        || dictTip == nil)
     {
-        return; //not have any carousel to show
+        return;
     }
-    self.tipElement = tip;
+    NSAssert([dictTip isKindOfClass:[NSDictionary class]], @"Expect dictionary.");
+    if (![dictTip isKindOfClass:[NSDictionary class]])
+    {
+        return;
+    }
+    NSDictionary *dictCarousel = dictTip[@"carousel"];
+    if (dictCarousel == nil)
+    {
+        return;
+    }
+    NSAssert([dictCarousel isKindOfClass:[NSDictionary class]], @"Expect dictionary.");
+    if (![dictCarousel isKindOfClass:[NSDictionary class]])
+    {
+        return;
+    }
+    NSArray *arrayItems = dictCarousel[@"items"];
+    NSAssert([arrayItems isKindOfClass:[NSArray class]], @"Expect array.");
+    if (![arrayItems isKindOfClass:[NSArray class]])
+    {
+        return;
+    }
+    if (arrayItems.count == 0)
+    {
+        return;
+    }
+    //here get something to show
+    self.dictTip = dictTip;
     UIView *viewCarousel = [[UIView alloc] init];
     [viewContent addSubview:viewCarousel];
     //must have this otherwise constraints cannot work
     viewCarousel.translatesAutoresizingMaskIntoConstraints = NO;
     [viewContent sendSubviewToBack:viewCarousel];
-    viewContent.layer.borderColor = tip.carousel.borderColor.CGColor;
-    viewContent.layer.borderWidth = tip.carousel.borderWidth;
-    viewContent.layer.cornerRadius = tip.carousel.cornerRadius;
-    PaperOnboarding *viewOnboarding = [[PaperOnboarding alloc] initWithItemsCount:tip.carousel.items.count];
+    UIColor *borderColor = [SHCarouselLayout colorFromHexString:dictCarousel[@"borderColor"]];
+    viewContent.layer.borderColor = borderColor.CGColor;
+    viewContent.layer.borderWidth = [dictCarousel[@"borderWidth"] floatValue];
+    CGFloat cornerRadius = [dictCarousel[@"cornerRadius"] floatValue];
+    viewContent.layer.cornerRadius = cornerRadius;
+    PaperOnboarding *viewOnboarding = [[PaperOnboarding alloc] initWithItemsCount:arrayItems.count];
     viewOnboarding.dataSource = self;
     viewOnboarding.delegate = self;
     viewOnboarding.translatesAutoresizingMaskIntoConstraints = NO;
     [viewCarousel addSubview:viewOnboarding];
     viewOnboarding.layer.borderWidth = 0;
-    viewOnboarding.layer.cornerRadius = tip.carousel.cornerRadius;
+    viewOnboarding.layer.cornerRadius = cornerRadius;
     viewOnboarding.clipsToBounds = YES; //limit content even with shadow
-    if (tip.carousel.boxShadow == 0) //no shadow
+    CGFloat boxShadow = [dictCarousel[@"boxShadow"] floatValue];
+    if (boxShadow == 0) //no shadow
     {
         //clipsToBounds and masksToBound not co-work well.
         //when masksToBound=NO it doesn't show shadow,
@@ -73,9 +102,9 @@
     }
     else
     {
-        viewCarousel.layer.shadowOffset = CGSizeMake(tip.carousel.boxShadow, tip.carousel.boxShadow);
+        viewCarousel.layer.shadowOffset = CGSizeMake(boxShadow, boxShadow);
         viewCarousel.layer.shadowOpacity = 0.5f;
-        viewCarousel.layer.shadowRadius = tip.carousel.cornerRadius;
+        viewCarousel.layer.shadowRadius = cornerRadius;
     }
     //use constraints to add the paper onboarding view
     NSLayoutConstraint *leadingInner = [NSLayoutConstraint
@@ -121,7 +150,7 @@
                                    toItem:viewContent
                                    attribute:NSLayoutAttributeLeading
                                    multiplier:1.0f
-                                   constant:tip.carousel.margin.left];
+                                   constant:[dictCarousel[@"margin.left"] floatValue]];
     [viewContent addConstraint:leading];
     NSLayoutConstraint *trailing =[NSLayoutConstraint
                                    constraintWithItem:viewCarousel
@@ -130,7 +159,7 @@
                                    toItem:viewContent
                                    attribute:NSLayoutAttributeTrailing
                                    multiplier:1.0f
-                                   constant:-tip.carousel.margin.right];
+                                   constant:-[dictCarousel[@"margin.right"] floatValue]];
     [viewContent addConstraint:trailing];
     NSLayoutConstraint *top =[NSLayoutConstraint
                               constraintWithItem:viewCarousel
@@ -139,7 +168,7 @@
                               toItem:viewContent
                               attribute:NSLayoutAttributeTop
                               multiplier:1.0f
-                              constant:tip.carousel.margin.top];
+                              constant:[dictCarousel[@"margin.top"] floatValue]];
     [viewContent addConstraint:top];
     NSLayoutConstraint *bottom =[NSLayoutConstraint
                                  constraintWithItem:viewCarousel
@@ -148,7 +177,7 @@
                                  toItem:viewContent
                                  attribute:NSLayoutAttributeBottom
                                  multiplier:1.0f
-                                 constant:-tip.carousel.margin.bottom];
+                                 constant:-[dictCarousel[@"margin.bottom"] floatValue]];
     [viewContent addConstraint:bottom];
 }
 
@@ -156,24 +185,24 @@
 
 - (NSInteger)onboardingItemsCount SWIFT_WARN_UNUSED_RESULT
 {
-    return self.tipElement.carousel.items.count;
+    return ((NSArray *)self.dictTip[@"carousel"][@"items"]).count;
 }
 
 - (OnboardingItemInfo * _Nonnull)onboardingItemAtIndex:(NSInteger)index SWIFT_WARN_UNUSED_RESULT
 {
     OnboardingItemInfo *item = [OnboardingItemInfo new];
-    SHTipCarouselItem *tipItem = self.tipElement.carousel.items[index];
-    item.shImage = tipItem.image;
-    item.shImageSource = tipItem.imageSource;
-    item.shTitle = tipItem.titleText;
-    item.shDesc = tipItem.contentText;
-    item.shIcon = tipItem.icon;
-    item.shIconSource = tipItem.iconSource;
-    item.shColor = tipItem.backgroundColor;
-    item.shTitleColor = tipItem.titleColor;
-    item.shDescriptionColor = tipItem.contentColor;
-    item.shTitleFont = tipItem.titleFont;
-    item.shDescriptionFont = tipItem.contentFont;
+    NSDictionary *tipItem = ((NSArray *)self.dictTip[@"carousel"][@"items"])[index];
+    item.shImage = tipItem[@"image"];
+    item.shImageSource = tipItem[@"imageSource"];
+    item.shTitle = tipItem[@"titleText"];
+    item.shDesc = tipItem[@"contentText"];
+    item.shIcon = tipItem[@"icon"];
+    item.shIconSource = tipItem[@"iconSource"];
+    item.shColor = [SHCarouselLayout colorFromHexString:tipItem[@"backgroundColor"]];
+    item.shTitleColor = [SHCarouselLayout colorFromHexString:tipItem[@"titleColor"]];
+    item.shDescriptionColor = [SHCarouselLayout colorFromHexString:tipItem[@"contentColor"]];
+    item.shTitleFont = tipItem[@"titleFont"];
+    item.shDescriptionFont = tipItem[@"contentFont"];
     return item;
 }
 
@@ -187,6 +216,48 @@
 
 - (void)onboardingConfigurationItem:(OnboardingContentViewItem * _Nonnull)item index:(NSInteger)index
 {
+}
+
+#pragma mark - private functions
+
++ (UIColor *)colorFromHexString:(NSString *)hexString
+{
+    if (![hexString isKindOfClass:[NSString class]])
+    {
+        return nil;
+    }
+    if (hexString.length != 7 && hexString.length != 9)
+    {
+        return nil;
+    }
+    if (![hexString hasPrefix:@"#"])
+    {
+        return nil;
+    }
+    NSScanner *scanner = [NSScanner scannerWithString:hexString];
+    [scanner setScanLocation:1]; // bypass '#' character
+    unsigned rgbValue = 0;
+    [scanner scanHexInt:&rgbValue];
+    CGFloat red, green, blue, alpha;
+    red = ((rgbValue & 0xFF0000) >> 16)/255.0;
+    green = ((rgbValue & 0xFF00) >> 8)/255.0;
+    blue = (rgbValue & 0xFF)/255.0;
+    if (hexString.length == 7)
+    {
+        alpha = 1.0;
+    }
+    else
+    {
+        alpha = ((rgbValue & 0xFF000000) >> 24)/255.0;
+    }
+    if (red >= 0 && red <= 1 && green >= 0 && green <= 1 && blue >= 0 && blue <= 1 && alpha >= 0 && alpha <= 1)
+    {
+        return [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
+    }
+    else
+    {
+        return nil;
+    }
 }
 
 @end
