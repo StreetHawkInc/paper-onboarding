@@ -21,7 +21,7 @@
 
 @interface SHCarouselLayout () <PaperOnboardingDataSource, PaperOnboardingDelegate>
 
-@property (nonatomic, strong) NSDictionary *dictTip;
+@property (nonatomic, strong) NSDictionary *dictCarousel;
 
 + (UIColor *)colorFromHexString:(NSString *)hexString;
 
@@ -39,21 +39,11 @@
     return sharedInstance;
 }
 
-- (void)layoutCarouselOnView:(UIView *)viewContent forTip:(NSDictionary *)dictTip
+- (void)layoutCarouselOnView:(UIView *)viewContent forTip:(NSDictionary *)dictCarousel
 {
     //not have any carousel to show
     if (viewContent == nil
-        || dictTip == nil)
-    {
-        return;
-    }
-    NSAssert([dictTip isKindOfClass:[NSDictionary class]], @"Expect dictionary.");
-    if (![dictTip isKindOfClass:[NSDictionary class]])
-    {
-        return;
-    }
-    NSDictionary *dictCarousel = dictTip[@"carousel"];
-    if (dictCarousel == nil)
+        || dictCarousel == nil)
     {
         return;
     }
@@ -73,7 +63,7 @@
         return;
     }
     //here get something to show
-    self.dictTip = dictTip;
+    self.dictCarousel = dictCarousel;
     UIView *viewCarousel = [[UIView alloc] init];
     [viewContent addSubview:viewCarousel];
     //must have this otherwise constraints cannot work
@@ -185,13 +175,13 @@
 
 - (NSInteger)onboardingItemsCount SWIFT_WARN_UNUSED_RESULT
 {
-    return ((NSArray *)self.dictTip[@"carousel"][@"items"]).count;
+    return ((NSArray *)self.dictCarousel[@"items"]).count;
 }
 
 - (OnboardingItemInfo * _Nonnull)onboardingItemAtIndex:(NSInteger)index SWIFT_WARN_UNUSED_RESULT
 {
     OnboardingItemInfo *item = [OnboardingItemInfo new];
-    NSDictionary *tipItem = ((NSArray *)self.dictTip[@"carousel"][@"items"])[index];
+    NSDictionary *tipItem = ((NSArray *)self.dictCarousel[@"items"])[index];
     item.shImage = tipItem[@"image"];
     item.shImageSource = tipItem[@"imageSource"];
     item.shTitle = tipItem[@"titleText"];

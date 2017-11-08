@@ -27,6 +27,6 @@
 /**
  Layout carousel on a view content.
  */
-- (void)layoutCarouselOnView:(UIView *)viewContent forTip:(NSDictionary *)dictTip;
+- (void)layoutCarouselOnView:(UIView *)viewContent forTip:(NSDictionary *)dictCarousel;
 
 @end
