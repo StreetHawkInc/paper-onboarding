@@ -172,11 +172,14 @@
     //first item doesn't trigger onboardingWillTransitonToIndex or onboardingDidTransitonToIndex.
     //so send feed result when carousel display.
     //next when swiping forward or backward, the delegates are triggered to send feed result.
-    [StreetHawk notifyFeedResult:tip.feed_id
-                      withResult:SHResult_Accept
-                      withStepId:tip.carousel.items.firstObject.suid //above check guaranteed
-                      deleteFeed:NO
-                       completed:NO];
+    NSDictionary *dict = @{@"feed_id": dictCarousel[@"feed_id"],
+                           @"result": @(1),
+                           @"step_id": ((NSArray *)self.dictCarousel[@"items"])[0][@"suid"],
+                           @"delete": @(NO),
+                           @"complete": @(NO)};
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"SH_PointziBridge_FeedResult_Notification"
+                                                        object:self
+                                                      userInfo:dict];
 }
 
 #pragma mark - delegate and datasource
@@ -206,12 +209,15 @@
 
 - (void)onboardingWillTransitonToIndex:(NSInteger)index
 {
-    SHTipCarouselItem *tipItem = self.tipElement.carousel.items[index];
-    [StreetHawk notifyFeedResult:self.tipElement.feed_id
-                      withResult:SHResult_Accept
-                      withStepId:tipItem.suid //above check guaranteed
-                      deleteFeed:NO
-                       completed:NO];
+    NSDictionary *tipItem = ((NSArray *)self.dictCarousel[@"items"])[index];
+    NSDictionary *dict = @{@"feed_id": self.dictCarousel[@"feed_id"],
+                           @"result": @(1),
+                           @"step_id": tipItem[@"suid"],
+                           @"delete": @(NO),
+                           @"complete": @(NO)};
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"SH_PointziBridge_FeedResult_Notification"
+                                                        object:self
+                                                      userInfo:dict];
 }
 
 - (void)onboardingDidTransitonToIndex:(NSInteger)index
