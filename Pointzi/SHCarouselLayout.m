@@ -53,6 +53,10 @@
         return;
     }
     NSArray *arrayItems = dictCarousel[@"items"];
+    if (arrayItems == nil)
+    {
+        return;
+    }
     NSAssert([arrayItems isKindOfClass:[NSArray class]], @"Expect array.");
     if (![arrayItems isKindOfClass:[NSArray class]])
     {
