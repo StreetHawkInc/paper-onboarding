@@ -76,25 +76,27 @@
     //here get something to show
     self.viewTip = viewContent;
     self.dictCarousel = dictCarousel;
-    UIView *viewCarousel = [[UIView alloc] init];
-    self.viewCarouselContainer = viewCarousel;
+    UIView *viewCarousel = [[UIView alloc] init]; //viewCarousel has shadow
+    self.viewCarouselContainer = [[UIView alloc] init]; //viewCarouselContainer doesn't have shadow
     [viewContent addSubview:viewCarousel];
+    [viewCarousel addSubview:self.viewCarouselContainer];
     //must have this otherwise constraints cannot work
     viewCarousel.translatesAutoresizingMaskIntoConstraints = NO;
+    self.viewCarouselContainer.translatesAutoresizingMaskIntoConstraints = NO;
     [viewContent sendSubviewToBack:viewCarousel];
     UIColor *borderColor = [SHCarouselLayout colorFromHexString:dictCarousel[@"borderColor"]];
-    viewContent.layer.borderColor = borderColor.CGColor;
-    viewContent.layer.borderWidth = [dictCarousel[@"borderWidth"] floatValue];
+    viewCarousel.layer.borderColor = borderColor.CGColor;
+    viewCarousel.layer.borderWidth = [dictCarousel[@"borderWidth"] floatValue];
     CGFloat cornerRadius = [dictCarousel[@"cornerRadius"] floatValue];
-    viewContent.layer.cornerRadius = cornerRadius;
+    viewCarousel.layer.cornerRadius = cornerRadius;
     PaperOnboarding *viewOnboarding = [[PaperOnboarding alloc] initWithItemsCount:arrayItems.count];
     viewOnboarding.dataSource = self;
     viewOnboarding.delegate = self;
     viewOnboarding.translatesAutoresizingMaskIntoConstraints = NO;
-    [viewCarousel addSubview:viewOnboarding];
-    viewOnboarding.layer.borderWidth = 0;
-    viewOnboarding.layer.cornerRadius = cornerRadius;
-    viewOnboarding.clipsToBounds = YES; //limit content even with shadow
+    [self.viewCarouselContainer addSubview:viewOnboarding];
+    self.viewCarouselContainer.layer.borderWidth = 0;
+    self.viewCarouselContainer.layer.cornerRadius = cornerRadius;
+    self.viewCarouselContainer.clipsToBounds = YES; //limit content even with shadow
     CGFloat boxShadow = [dictCarousel[@"boxShadow"] floatValue];
     if (boxShadow == 0) //no shadow
     {
@@ -183,10 +185,48 @@
                                  multiplier:1.0f
                                  constant:-[dictCarousel[@"margin.bottom"] floatValue]];
     [viewContent addConstraint:bottom];
+    NSLayoutConstraint *leadingContainer = [NSLayoutConstraint
+                                            constraintWithItem:self.viewCarouselContainer
+                                            attribute:NSLayoutAttributeLeading
+                                            relatedBy:NSLayoutRelationEqual
+                                            toItem:viewCarousel
+                                            attribute:NSLayoutAttributeLeading
+                                            multiplier:1.0f
+                                            constant:0];
+    [viewCarousel addConstraint:leadingContainer];
+    NSLayoutConstraint *trailingContainer =[NSLayoutConstraint
+                                            constraintWithItem:self.viewCarouselContainer
+                                            attribute:NSLayoutAttributeTrailing
+                                            relatedBy:NSLayoutRelationEqual
+                                            toItem:viewCarousel
+                                            attribute:NSLayoutAttributeTrailing
+                                            multiplier:1.0f
+                                            constant:0];
+    [viewCarousel addConstraint:trailingContainer];
+    NSLayoutConstraint *topContainer =[NSLayoutConstraint
+                                       constraintWithItem:self.viewCarouselContainer
+                                       attribute:NSLayoutAttributeTop
+                                       relatedBy:NSLayoutRelationEqual
+                                       toItem:viewCarousel
+                                       attribute:NSLayoutAttributeTop
+                                       multiplier:1.0f
+                                       constant:0];
+    [viewCarousel addConstraint:topContainer];
+    NSLayoutConstraint *bottomContainer =[NSLayoutConstraint
+                                          constraintWithItem:self.viewCarouselContainer
+                                          attribute:NSLayoutAttributeBottom
+                                          relatedBy:NSLayoutRelationEqual
+                                          toItem:viewCarousel
+                                          attribute:NSLayoutAttributeBottom
+                                          multiplier:1.0f
+                                          constant:0];
+    [viewCarousel addConstraint:bottomContainer];
     //first item doesn't trigger onboardingWillTransitonToIndex or onboardingDidTransitonToIndex.
     //so send feed result when carousel display.
     //next when swiping forward or backward, the delegates are triggered to send feed result.
     [self sendFeedResultForIndex:0];
+    NSDictionary *tipItem = ((NSArray *)self.dictCarousel[@"items"])[0];
+    self.viewCarouselContainer.backgroundColor = [SHCarouselLayout colorFromHexString:tipItem[@"backgroundColor"]];
     //layout button in a delay to get parent frame ready
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self layoutButtonForIndex:0];
@@ -220,6 +260,11 @@
 
 - (void)onboardingWillTransitonToIndex:(NSInteger)index
 {
+    //Paper onboarding's animation is 0.5 duration, be consistent and looks good.
+    [UIView animateWithDuration:0.5 animations:^{
+        NSDictionary *tipItem = ((NSArray *)self.dictCarousel[@"items"])[index];
+        self.viewCarouselContainer.backgroundColor = [SHCarouselLayout colorFromHexString:tipItem[@"backgroundColor"]];
+    }];
     [self sendFeedResultForIndex:index];
 }
 
