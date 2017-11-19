@@ -188,7 +188,7 @@
     //next when swiping forward or backward, the delegates are triggered to send feed result.
     [self sendFeedResultForIndex:0];
     //layout button in a delay to get parent frame ready
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self layoutButtonForIndex:0];
     });
 }
@@ -289,7 +289,8 @@
 
 - (void)layoutButtonForIndex:(NSInteger)index
 {
-    UIButton *buttonTarget = self.dictCarousel[@"button_obj"];
+    NSDictionary *tipItem = ((NSArray *)self.dictCarousel[@"items"])[index];
+    UIButton *buttonTarget = tipItem[@"button_obj"];
     if (buttonTarget == nil //remove button
         && self.button != nil)
     {
@@ -299,6 +300,7 @@
     }
     else if (buttonTarget != nil)
     {
+        NSAssert(buttonTarget.tag == index, @"Wrong tag for button");
         if (self.button != nil)
         {
             //tag is index, it's same so nothing to do
@@ -313,14 +315,14 @@
         }
         //add new bottom button
         self.button = buttonTarget;
-        CGFloat width = [self.dictCarousel[@"button_width"] floatValue];
-        CGFloat height = [self.dictCarousel[@"button_height"] floatValue];
-        CGFloat marginTop = [self.dictCarousel[@"button_margin_top"] floatValue];
-        CGFloat marginBottom = [self.dictCarousel[@"button_margin_bottom"] floatValue];
-        CGFloat marginLeft = [self.dictCarousel[@"button_margin_left"] floatValue];
-        CGFloat marginRight = [self.dictCarousel[@"button_margin_right"] floatValue];
+        CGFloat width = [tipItem[@"button_width"] floatValue];
+        CGFloat height = [tipItem[@"button_height"] floatValue];
+        CGFloat marginTop = [tipItem[@"button_margin_top"] floatValue];
+        CGFloat marginBottom = [tipItem[@"button_margin_bottom"] floatValue];
+        CGFloat marginLeft = [tipItem[@"button_margin_left"] floatValue];
+        CGFloat marginRight = [tipItem[@"button_margin_right"] floatValue];
         CGSize sizeContain = self.viewCarouselContainer.frame.size;
-        self.constraintBottom.constant = marginTop + height + marginBottom;
+        self.constraintBottom.constant = - (marginTop + height + marginBottom);
         if (width > 0 && width <= 1)
         {
             width = sizeContain.width * width;
