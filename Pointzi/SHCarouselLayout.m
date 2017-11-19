@@ -74,6 +74,7 @@
         return;
     }
     //here get something to show
+    self.button = nil; //clear
     self.viewTip = viewContent;
     self.dictCarousel = dictCarousel;
     UIView *viewCarousel = [[UIView alloc] init]; //viewCarousel has shadow
