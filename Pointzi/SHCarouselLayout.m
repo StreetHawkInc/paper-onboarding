@@ -21,9 +21,16 @@
 
 @interface SHCarouselLayout () <PaperOnboardingDataSource, PaperOnboardingDelegate>
 
+@property (nonatomic, strong) UIView *viewTip;
 @property (nonatomic, strong) NSDictionary *dictCarousel;
 
+@property (nonatomic, strong) UIView *viewCarouselContainer;
+@property (nonatomic, strong) NSLayoutConstraint *constraintBottom;
+@property (nonatomic, strong) UIButton *button;
+
 + (UIColor *)colorFromHexString:(NSString *)hexString;
+- (void)sendFeedResultForIndex:(NSInteger)index;
+- (void)layoutButtonForIndex:(NSInteger)index;
 
 @end
 
@@ -67,8 +74,10 @@
         return;
     }
     //here get something to show
+    self.viewTip = viewContent;
     self.dictCarousel = dictCarousel;
     UIView *viewCarousel = [[UIView alloc] init];
+    self.viewCarouselContainer = viewCarousel;
     [viewContent addSubview:viewCarousel];
     //must have this otherwise constraints cannot work
     viewCarousel.translatesAutoresizingMaskIntoConstraints = NO;
@@ -137,6 +146,7 @@
                                       multiplier:1.0f
                                       constant:0];
     [viewCarousel addConstraint:bottomInner];
+    self.constraintBottom = bottomInner;
     NSLayoutConstraint *leading = [NSLayoutConstraint
                                    constraintWithItem:viewCarousel
                                    attribute:NSLayoutAttributeLeading
@@ -176,14 +186,11 @@
     //first item doesn't trigger onboardingWillTransitonToIndex or onboardingDidTransitonToIndex.
     //so send feed result when carousel display.
     //next when swiping forward or backward, the delegates are triggered to send feed result.
-    NSDictionary *dict = @{@"feed_id": dictCarousel[@"feed_id"],
-                           @"result": @(1),
-                           @"step_id": ((NSArray *)self.dictCarousel[@"items"])[0][@"suid"],
-                           @"delete": @(NO),
-                           @"complete": @(NO)};
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"SH_PointziBridge_FeedResult_Notification"
-                                                        object:self
-                                                      userInfo:dict];
+    [self sendFeedResultForIndex:0];
+    //layout button in a delay to get parent frame ready
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self layoutButtonForIndex:0];
+    });
 }
 
 #pragma mark - delegate and datasource
@@ -213,19 +220,12 @@
 
 - (void)onboardingWillTransitonToIndex:(NSInteger)index
 {
-    NSDictionary *tipItem = ((NSArray *)self.dictCarousel[@"items"])[index];
-    NSDictionary *dict = @{@"feed_id": self.dictCarousel[@"feed_id"],
-                           @"result": @(1),
-                           @"step_id": tipItem[@"suid"],
-                           @"delete": @(NO),
-                           @"complete": @(NO)};
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"SH_PointziBridge_FeedResult_Notification"
-                                                        object:self
-                                                      userInfo:dict];
+    [self sendFeedResultForIndex:index];
 }
 
 - (void)onboardingDidTransitonToIndex:(NSInteger)index
 {
+    [self layoutButtonForIndex:index];
 }
 
 - (void)onboardingConfigurationItem:(OnboardingContentViewItem * _Nonnull)item index:(NSInteger)index
@@ -271,6 +271,87 @@
     else
     {
         return nil;
+    }
+}
+
+- (void)sendFeedResultForIndex:(NSInteger)index
+{
+    NSDictionary *tipItem = ((NSArray *)self.dictCarousel[@"items"])[index];
+    NSDictionary *dict = @{@"feed_id": self.dictCarousel[@"feed_id"],
+                           @"result": @(1),
+                           @"step_id": tipItem[@"suid"],
+                           @"delete": @(NO),
+                           @"complete": @(NO)};
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"SH_PointziBridge_FeedResult_Notification"
+                                                        object:self
+                                                      userInfo:dict];
+}
+
+- (void)layoutButtonForIndex:(NSInteger)index
+{
+    UIButton *buttonTarget = self.dictCarousel[@"button_obj"];
+    if (buttonTarget == nil //remove button
+        && self.button != nil)
+    {
+        [self.button removeFromSuperview];
+        self.button = nil;
+        self.constraintBottom.constant = 0;
+    }
+    else if (buttonTarget != nil)
+    {
+        if (self.button != nil)
+        {
+            //tag is index, it's same so nothing to do
+            if (buttonTarget.tag == self.button.tag)
+            {
+                return;
+            }
+            else //different one, remove current
+            {
+                [self.button removeFromSuperview];
+            }
+        }
+        //add new bottom button
+        self.button = buttonTarget;
+        CGFloat width = [self.dictCarousel[@"button_width"] floatValue];
+        CGFloat height = [self.dictCarousel[@"button_height"] floatValue];
+        CGFloat marginTop = [self.dictCarousel[@"button_margin_top"] floatValue];
+        CGFloat marginBottom = [self.dictCarousel[@"button_margin_bottom"] floatValue];
+        CGFloat marginLeft = [self.dictCarousel[@"button_margin_left"] floatValue];
+        CGFloat marginRight = [self.dictCarousel[@"button_margin_right"] floatValue];
+        CGSize sizeContain = self.viewCarouselContainer.frame.size;
+        self.constraintBottom.constant = marginTop + height + marginBottom;
+        if (width > 0 && width <= 1)
+        {
+            width = sizeContain.width * width;
+        }
+        else if (width == 0)
+        {
+            width = sizeContain.width;
+        }
+        [self.viewCarouselContainer addSubview:buttonTarget];
+        if (marginLeft == 0
+            && marginRight == 0) //put in center
+        {
+            buttonTarget.frame = CGRectMake((sizeContain.width - width) / 2,
+                                            sizeContain.height - marginBottom - height,
+                                            width,
+                                            height);
+        }
+        else if (marginLeft != 0) //use left first
+        {
+            buttonTarget.frame = CGRectMake(marginLeft,
+                                            sizeContain.height - marginBottom - height,
+                                            width,
+                                            height);
+        }
+        else if (marginRight != 0) //use right if exist
+        {
+            buttonTarget.frame = CGRectMake(sizeContain.width - marginRight - width,
+                                            sizeContain.height - marginBottom - height,
+                                            width,
+                                            height);
+        }
     }
 }
 
