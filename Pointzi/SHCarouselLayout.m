@@ -21,9 +21,16 @@
 
 @interface SHCarouselLayout () <PaperOnboardingDataSource, PaperOnboardingDelegate>
 
+@property (nonatomic, strong) UIView *viewTip;
 @property (nonatomic, strong) NSDictionary *dictCarousel;
 
+@property (nonatomic, strong) UIView *viewCarouselContainer;
+@property (nonatomic, strong) NSLayoutConstraint *constraintBottom;
+@property (nonatomic, strong) UIButton *button;
+
 + (UIColor *)colorFromHexString:(NSString *)hexString;
+- (void)sendFeedResultForIndex:(NSInteger)index;
+- (void)layoutButtonForIndex:(NSInteger)index;
 
 @end
 
@@ -67,25 +74,30 @@
         return;
     }
     //here get something to show
+    self.button = nil; //clear
+    self.viewTip = viewContent;
     self.dictCarousel = dictCarousel;
-    UIView *viewCarousel = [[UIView alloc] init];
+    UIView *viewCarousel = [[UIView alloc] init]; //viewCarousel has shadow
+    self.viewCarouselContainer = [[UIView alloc] init]; //viewCarouselContainer doesn't have shadow
     [viewContent addSubview:viewCarousel];
+    [viewCarousel addSubview:self.viewCarouselContainer];
     //must have this otherwise constraints cannot work
     viewCarousel.translatesAutoresizingMaskIntoConstraints = NO;
+    self.viewCarouselContainer.translatesAutoresizingMaskIntoConstraints = NO;
     [viewContent sendSubviewToBack:viewCarousel];
     UIColor *borderColor = [SHCarouselLayout colorFromHexString:dictCarousel[@"borderColor"]];
-    viewContent.layer.borderColor = borderColor.CGColor;
-    viewContent.layer.borderWidth = [dictCarousel[@"borderWidth"] floatValue];
+    viewCarousel.layer.borderColor = borderColor.CGColor;
+    viewCarousel.layer.borderWidth = [dictCarousel[@"borderWidth"] floatValue];
     CGFloat cornerRadius = [dictCarousel[@"cornerRadius"] floatValue];
-    viewContent.layer.cornerRadius = cornerRadius;
+    viewCarousel.layer.cornerRadius = cornerRadius;
     PaperOnboarding *viewOnboarding = [[PaperOnboarding alloc] initWithItemsCount:arrayItems.count];
     viewOnboarding.dataSource = self;
     viewOnboarding.delegate = self;
     viewOnboarding.translatesAutoresizingMaskIntoConstraints = NO;
-    [viewCarousel addSubview:viewOnboarding];
-    viewOnboarding.layer.borderWidth = 0;
-    viewOnboarding.layer.cornerRadius = cornerRadius;
-    viewOnboarding.clipsToBounds = YES; //limit content even with shadow
+    [self.viewCarouselContainer addSubview:viewOnboarding];
+    self.viewCarouselContainer.layer.borderWidth = 0;
+    self.viewCarouselContainer.layer.cornerRadius = cornerRadius;
+    self.viewCarouselContainer.clipsToBounds = YES; //limit content even with shadow
     CGFloat boxShadow = [dictCarousel[@"boxShadow"] floatValue];
     if (boxShadow == 0) //no shadow
     {
@@ -137,6 +149,7 @@
                                       multiplier:1.0f
                                       constant:0];
     [viewCarousel addConstraint:bottomInner];
+    self.constraintBottom = bottomInner;
     NSLayoutConstraint *leading = [NSLayoutConstraint
                                    constraintWithItem:viewCarousel
                                    attribute:NSLayoutAttributeLeading
@@ -173,17 +186,52 @@
                                  multiplier:1.0f
                                  constant:-[dictCarousel[@"margin.bottom"] floatValue]];
     [viewContent addConstraint:bottom];
+    NSLayoutConstraint *leadingContainer = [NSLayoutConstraint
+                                            constraintWithItem:self.viewCarouselContainer
+                                            attribute:NSLayoutAttributeLeading
+                                            relatedBy:NSLayoutRelationEqual
+                                            toItem:viewCarousel
+                                            attribute:NSLayoutAttributeLeading
+                                            multiplier:1.0f
+                                            constant:0];
+    [viewCarousel addConstraint:leadingContainer];
+    NSLayoutConstraint *trailingContainer =[NSLayoutConstraint
+                                            constraintWithItem:self.viewCarouselContainer
+                                            attribute:NSLayoutAttributeTrailing
+                                            relatedBy:NSLayoutRelationEqual
+                                            toItem:viewCarousel
+                                            attribute:NSLayoutAttributeTrailing
+                                            multiplier:1.0f
+                                            constant:0];
+    [viewCarousel addConstraint:trailingContainer];
+    NSLayoutConstraint *topContainer =[NSLayoutConstraint
+                                       constraintWithItem:self.viewCarouselContainer
+                                       attribute:NSLayoutAttributeTop
+                                       relatedBy:NSLayoutRelationEqual
+                                       toItem:viewCarousel
+                                       attribute:NSLayoutAttributeTop
+                                       multiplier:1.0f
+                                       constant:0];
+    [viewCarousel addConstraint:topContainer];
+    NSLayoutConstraint *bottomContainer =[NSLayoutConstraint
+                                          constraintWithItem:self.viewCarouselContainer
+                                          attribute:NSLayoutAttributeBottom
+                                          relatedBy:NSLayoutRelationEqual
+                                          toItem:viewCarousel
+                                          attribute:NSLayoutAttributeBottom
+                                          multiplier:1.0f
+                                          constant:0];
+    [viewCarousel addConstraint:bottomContainer];
     //first item doesn't trigger onboardingWillTransitonToIndex or onboardingDidTransitonToIndex.
     //so send feed result when carousel display.
     //next when swiping forward or backward, the delegates are triggered to send feed result.
-    NSDictionary *dict = @{@"feed_id": dictCarousel[@"feed_id"],
-                           @"result": @(1),
-                           @"step_id": ((NSArray *)self.dictCarousel[@"items"])[0][@"suid"],
-                           @"delete": @(NO),
-                           @"complete": @(NO)};
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"SH_PointziBridge_FeedResult_Notification"
-                                                        object:self
-                                                      userInfo:dict];
+    [self sendFeedResultForIndex:0];
+    NSDictionary *tipItem = ((NSArray *)self.dictCarousel[@"items"])[0];
+    self.viewCarouselContainer.backgroundColor = [SHCarouselLayout colorFromHexString:tipItem[@"backgroundColor"]];
+    //layout button in a delay to get parent frame ready
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self layoutButtonForIndex:0];
+    });
 }
 
 #pragma mark - delegate and datasource
@@ -213,19 +261,17 @@
 
 - (void)onboardingWillTransitonToIndex:(NSInteger)index
 {
-    NSDictionary *tipItem = ((NSArray *)self.dictCarousel[@"items"])[index];
-    NSDictionary *dict = @{@"feed_id": self.dictCarousel[@"feed_id"],
-                           @"result": @(1),
-                           @"step_id": tipItem[@"suid"],
-                           @"delete": @(NO),
-                           @"complete": @(NO)};
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"SH_PointziBridge_FeedResult_Notification"
-                                                        object:self
-                                                      userInfo:dict];
+    //Paper onboarding's animation is 0.5 duration, be consistent and looks good.
+    [UIView animateWithDuration:0.5 animations:^{
+        NSDictionary *tipItem = ((NSArray *)self.dictCarousel[@"items"])[index];
+        self.viewCarouselContainer.backgroundColor = [SHCarouselLayout colorFromHexString:tipItem[@"backgroundColor"]];
+    }];
+    [self sendFeedResultForIndex:index];
 }
 
 - (void)onboardingDidTransitonToIndex:(NSInteger)index
 {
+    [self layoutButtonForIndex:index];
 }
 
 - (void)onboardingConfigurationItem:(OnboardingContentViewItem * _Nonnull)item index:(NSInteger)index
@@ -271,6 +317,89 @@
     else
     {
         return nil;
+    }
+}
+
+- (void)sendFeedResultForIndex:(NSInteger)index
+{
+    NSDictionary *tipItem = ((NSArray *)self.dictCarousel[@"items"])[index];
+    NSDictionary *dict = @{@"feed_id": self.dictCarousel[@"feed_id"],
+                           @"result": @(1),
+                           @"step_id": tipItem[@"suid"],
+                           @"delete": @(NO),
+                           @"complete": @(NO)};
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"SH_PointziBridge_FeedResult_Notification"
+                                                        object:self
+                                                      userInfo:dict];
+}
+
+- (void)layoutButtonForIndex:(NSInteger)index
+{
+    NSDictionary *tipItem = ((NSArray *)self.dictCarousel[@"items"])[index];
+    UIButton *buttonTarget = tipItem[@"button_obj"];
+    if (buttonTarget == nil //remove button
+        && self.button != nil)
+    {
+        [self.button removeFromSuperview];
+        self.button = nil;
+        self.constraintBottom.constant = 0;
+    }
+    else if (buttonTarget != nil)
+    {
+        NSAssert(buttonTarget.tag == index, @"Wrong tag for button");
+        if (self.button != nil)
+        {
+            //tag is index, it's same so nothing to do
+            if (buttonTarget.tag == self.button.tag)
+            {
+                return;
+            }
+            else //different one, remove current
+            {
+                [self.button removeFromSuperview];
+            }
+        }
+        //add new bottom button
+        self.button = buttonTarget;
+        CGFloat width = [tipItem[@"button_width"] floatValue];
+        CGFloat height = [tipItem[@"button_height"] floatValue];
+        CGFloat marginTop = [tipItem[@"button_margin_top"] floatValue];
+        CGFloat marginBottom = [tipItem[@"button_margin_bottom"] floatValue];
+        CGFloat marginLeft = [tipItem[@"button_margin_left"] floatValue];
+        CGFloat marginRight = [tipItem[@"button_margin_right"] floatValue];
+        CGSize sizeContain = self.viewCarouselContainer.frame.size;
+        self.constraintBottom.constant = - (marginTop + height + marginBottom);
+        if (width > 0 && width <= 1)
+        {
+            width = sizeContain.width * width;
+        }
+        else if (width == 0)
+        {
+            width = sizeContain.width;
+        }
+        [self.viewCarouselContainer addSubview:buttonTarget];
+        if (marginLeft == 0
+            && marginRight == 0) //put in center
+        {
+            buttonTarget.frame = CGRectMake((sizeContain.width - width) / 2,
+                                            sizeContain.height - marginBottom - height,
+                                            width,
+                                            height);
+        }
+        else if (marginLeft != 0) //use left first
+        {
+            buttonTarget.frame = CGRectMake(marginLeft,
+                                            sizeContain.height - marginBottom - height,
+                                            width,
+                                            height);
+        }
+        else if (marginRight != 0) //use right if exist
+        {
+            buttonTarget.frame = CGRectMake(sizeContain.width - marginRight - width,
+                                            sizeContain.height - marginBottom - height,
+                                            width,
+                                            height);
+        }
     }
 }
 
