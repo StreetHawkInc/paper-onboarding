@@ -28,7 +28,7 @@
 @property (nonatomic, strong) NSLayoutConstraint *constraintBottom;
 @property (nonatomic, strong) UIButton *button;
 
-+ (UIColor *)colorFromHexString:(NSString *)hexString;
++ (UIColor *)colorFromString:(NSString *)hexString;
 - (void)sendFeedResultForIndex:(NSInteger)index;
 - (void)layoutButtonForIndex:(NSInteger)index;
 
@@ -85,7 +85,7 @@
     viewCarousel.translatesAutoresizingMaskIntoConstraints = NO;
     self.viewCarouselContainer.translatesAutoresizingMaskIntoConstraints = NO;
     [viewContent sendSubviewToBack:viewCarousel];
-    UIColor *borderColor = [SHCarouselLayout colorFromHexString:dictCarousel[@"borderColor"]];
+    UIColor *borderColor = [SHCarouselLayout colorFromString:dictCarousel[@"borderColor"]];
     viewCarousel.layer.borderColor = borderColor.CGColor;
     viewCarousel.layer.borderWidth = [dictCarousel[@"borderWidth"] floatValue];
     CGFloat cornerRadius = [dictCarousel[@"cornerRadius"] floatValue];
@@ -227,7 +227,7 @@
     //next when swiping forward or backward, the delegates are triggered to send feed result.
     [self sendFeedResultForIndex:0];
     NSDictionary *tipItem = ((NSArray *)self.dictCarousel[@"items"])[0];
-    self.viewCarouselContainer.backgroundColor = [SHCarouselLayout colorFromHexString:tipItem[@"backgroundColor"]];
+    self.viewCarouselContainer.backgroundColor = [SHCarouselLayout colorFromString:tipItem[@"backgroundColor"]];
     //layout button in a delay to get parent frame ready
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self layoutButtonForIndex:0];
@@ -251,9 +251,9 @@
     item.shDesc = tipItem[@"contentText"];
     item.shIcon = tipItem[@"icon"];
     item.shIconSource = tipItem[@"iconSource"];
-    item.shColor = [SHCarouselLayout colorFromHexString:tipItem[@"backgroundColor"]];
-    item.shTitleColor = [SHCarouselLayout colorFromHexString:tipItem[@"titleColor"]];
-    item.shDescriptionColor = [SHCarouselLayout colorFromHexString:tipItem[@"contentColor"]];
+    item.shColor = [SHCarouselLayout colorFromString:tipItem[@"backgroundColor"]];
+    item.shTitleColor = [SHCarouselLayout colorFromString:tipItem[@"titleColor"]];
+    item.shDescriptionColor = [SHCarouselLayout colorFromString:tipItem[@"contentColor"]];
     item.shTitleFont = tipItem[@"titleFont"];
     item.shDescriptionFont = tipItem[@"contentFont"];
     return item;
@@ -264,7 +264,7 @@
     //Paper onboarding's animation is 0.5 duration, be consistent and looks good.
     [UIView animateWithDuration:0.5 animations:^{
         NSDictionary *tipItem = ((NSArray *)self.dictCarousel[@"items"])[index];
-        self.viewCarouselContainer.backgroundColor = [SHCarouselLayout colorFromHexString:tipItem[@"backgroundColor"]];
+        self.viewCarouselContainer.backgroundColor = [SHCarouselLayout colorFromString:tipItem[@"backgroundColor"]];
     }];
     [self sendFeedResultForIndex:index];
 }
@@ -280,29 +280,46 @@
 
 #pragma mark - private functions
 
+#define RGB_COLOUR_CODE_LEN         3
+#define ARGB_COLOUR_CODE_LEN        4
+#define RRGGBB_COLOUR_CODE_LEN      6
+#define AARRGGBB_COLOUR_CODE_LEN    8
+
++ (BOOL)isRGB:(NSArray *)arrayComponents
+{
+    return arrayComponents.count >= RGB_COLOUR_CODE_LEN;
+}
+
++ (BOOL)isRGBA:(NSArray *)arrayComponents
+{
+    return arrayComponents.count == ARGB_COLOUR_CODE_LEN;
+}
+
 + (UIColor *)colorFromHexString:(NSString *)hexString
 {
-    if (![hexString isKindOfClass:[NSString class]])
-    {
-        return nil;
-    }
-    if (hexString.length != 7 && hexString.length != 9)
-    {
-        return nil;
-    }
     if (![hexString hasPrefix:@"#"])
     {
         return nil;
+    }
+    CGFloat red = -1;
+    CGFloat green = -1;
+    CGFloat blue = -1;
+    CGFloat alpha = -1;
+    if (hexString.length == RGB_COLOUR_CODE_LEN + 1)
+    {
+        NSString *red = [hexString substringWithRange:NSMakeRange(1, 1)];
+        NSString *green = [hexString substringWithRange:NSMakeRange(2, 1)];
+        NSString *blue = [hexString substringWithRange:NSMakeRange(3, 1)];
+        hexString = [NSString stringWithFormat:@"#%@%@%@%@%@%@", red, red, green, green, blue, blue];
     }
     NSScanner *scanner = [NSScanner scannerWithString:hexString];
     [scanner setScanLocation:1]; // bypass '#' character
     unsigned rgbValue = 0;
     [scanner scanHexInt:&rgbValue];
-    CGFloat red, green, blue, alpha;
     red = ((rgbValue & 0xFF0000) >> 16)/255.0;
     green = ((rgbValue & 0xFF00) >> 8)/255.0;
     blue = (rgbValue & 0xFF)/255.0;
-    if (hexString.length == 7)
+    if (hexString.length == RRGGBB_COLOUR_CODE_LEN + 1)
     {
         alpha = 1.0;
     }
@@ -310,7 +327,10 @@
     {
         alpha = ((rgbValue & 0xFF000000) >> 24)/255.0;
     }
-    if (red >= 0 && red <= 1 && green >= 0 && green <= 1 && blue >= 0 && blue <= 1 && alpha >= 0 && alpha <= 1)
+    if (red >= 0 && red <= 1
+        && green >= 0 && green <= 1
+        && blue >= 0 && blue <= 1
+        && alpha >= 0 && alpha <= 1)
     {
         return [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
     }
@@ -318,6 +338,69 @@
     {
         return nil;
     }
+}
+
++ (UIColor *)colorFromRGBString:(NSString *)rgbString
+{
+    CGFloat red = -1;
+    CGFloat green = -1;
+    CGFloat blue = -1;
+    CGFloat alpha = -1;
+    if ([rgbString.lowercaseString hasPrefix:@"rgb("]
+        && [rgbString.lowercaseString hasSuffix:@")"])
+    {
+        rgbString = [rgbString stringByReplacingOccurrencesOfString:@"rgb(" withString:@""];
+        rgbString = [rgbString stringByReplacingOccurrencesOfString:@")" withString:@""];
+        NSArray *arrayComponents = [rgbString componentsSeparatedByString:@","];
+        if ([self isRGB:arrayComponents])
+        {
+            red = [arrayComponents[0] floatValue]/255.0;
+            green = [arrayComponents[1] floatValue]/255.0;
+            blue = [arrayComponents[2] floatValue]/255.0;
+        }
+        if ([self isRGBA:arrayComponents])
+        {
+            alpha = [arrayComponents[3] floatValue];
+            if (alpha > 1)
+            {
+                alpha = alpha/255.0;
+            }
+        }
+        else
+        {
+            alpha = 1.0;
+        }
+    }
+    if (red >= 0 && red <= 1
+        && green >= 0 && green <= 1
+        && blue >= 0 && blue <= 1
+        && alpha >= 0 && alpha <= 1)
+    {
+        return [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
+    }
+    else
+    {
+        return nil;
+    }
+}
+
++ (UIColor *)colorFromString:(NSString *)str
+{
+    if (![str isKindOfClass:[NSString class]])
+    {
+        return nil;
+    }
+    if (str.length == RGB_COLOUR_CODE_LEN + 1 //#RGB
+        || str.length == RRGGBB_COLOUR_CODE_LEN + 1 //#RRGGBB
+        || str.length == AARRGGBB_COLOUR_CODE_LEN + 1) //#AARRGGBB
+    {
+        return [self colorFromHexString:str];
+    }
+    else //rgb(255,255,255,1)
+    {
+        return [self colorFromRGBString:str];
+    }
+    return nil;
 }
 
 - (void)sendFeedResultForIndex:(NSInteger)index
