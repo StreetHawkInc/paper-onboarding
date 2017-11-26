@@ -17,7 +17,7 @@
 
 #import "SHCarouselLayout.h"
 //header from PaperOnboarding
-#import <PaperOnboarding/PaperOnboarding-Swift.h>
+#import "PaperOnboarding-Swift.h"
 
 @interface SHCarouselLayout () <PaperOnboardingDataSource, PaperOnboardingDelegate>
 
