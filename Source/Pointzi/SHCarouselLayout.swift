@@ -102,10 +102,10 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
         let colorStr = dictCarousel["borderColor"] as? String
         let borderColor: UIColor? = SHCarouselLayout.color(from: colorStr)
         viewCarousel.layer.borderColor = borderColor?.cgColor
-        let borderStr = dictCarousel["borderWidth"] as? String
-        viewCarousel.layer.borderWidth = CGFloat((Float(borderStr ?? "") ?? 0.0))
-        let cornerRadiusStr = dictCarousel["cornerRadius"] as? String
-        let cornerRadius = CGFloat((Float(cornerRadiusStr ?? "") ?? 0.0))
+        let borderNum = dictCarousel["borderWidth"] as? NSNumber
+        viewCarousel.layer.borderWidth = CGFloat(Float((borderNum?.floatValue)!))
+        let cornerRadiusNum = dictCarousel["cornerRadius"] as? NSNumber
+        let cornerRadius = CGFloat(Float((cornerRadiusNum?.floatValue)!))
         viewCarousel.layer.cornerRadius = cornerRadius
         let viewOnboarding = PaperOnboarding(itemsCount: arrayItems.count)
         viewOnboarding.dataSource = self
@@ -115,8 +115,8 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
         viewCarouselContainer?.layer.borderWidth = 0
         viewCarouselContainer?.layer.cornerRadius = cornerRadius
         viewCarouselContainer?.clipsToBounds = true //limit content even with shadow
-        let boxShadowStr = dictCarousel["boxShadow"] as? String
-        let boxShadow = CGFloat((Float(boxShadowStr ?? "") ?? 0.0))
+        let boxShadowNum = dictCarousel["boxShadow"] as? NSNumber
+        let boxShadow = CGFloat(Float((boxShadowNum?.floatValue)!))
         if boxShadow == 0
         {
             //clipsToBounds and masksToBound not co-work well.
@@ -164,8 +164,8 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
                                              constant: 0)
         viewCarousel.addConstraint(bottomInner)
         self.constraintBottom = bottomInner
-        let leadingStr = dictCarousel["margin.left"] as? String
-        let leadingVal = CGFloat((Float(leadingStr ?? "") ?? 0.0))
+        let leadingNum = dictCarousel["margin.left"] as? NSNumber
+        let leadingVal = CGFloat(Float((leadingNum?.floatValue)!))
         let leading = NSLayoutConstraint(item: viewCarousel,
                                          attribute: .leading,
                                          relatedBy: .equal,
@@ -174,8 +174,8 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
                                          multiplier: 1.0,
                                          constant: leadingVal)
         viewContent.addConstraint(leading)
-        let trailingStr = dictCarousel["margin.right"] as? String
-        let trailingVal = CGFloat((Float(trailingStr ?? "") ?? 0.0))
+        let trailingNum = dictCarousel["margin.right"] as? NSNumber
+        let trailingVal = CGFloat(Float((trailingNum?.floatValue)!))
         let trailing = NSLayoutConstraint(item: viewCarousel,
                                           attribute: .trailing,
                                           relatedBy: .equal,
@@ -184,8 +184,8 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
                                           multiplier: 1.0,
                                           constant: trailingVal)
         viewContent.addConstraint(trailing)
-        let topStr = dictCarousel["margin.top"] as? String
-        let topVal = CGFloat((Float(topStr ?? "") ?? 0.0))
+        let topNum = dictCarousel["margin.top"] as? NSNumber
+        let topVal = CGFloat(Float((topNum?.floatValue)!))
         let top = NSLayoutConstraint(item: viewCarousel,
                                      attribute: .top,
                                      relatedBy: .equal,
@@ -194,8 +194,8 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
                                      multiplier: 1.0,
                                      constant: topVal)
         viewContent.addConstraint(top)
-        let bottomStr = dictCarousel["margin.bottom"] as? String
-        let bottomVal = CGFloat((Float(bottomStr ?? "") ?? 0.0))
+        let bottomNum = dictCarousel["margin.bottom"] as? NSNumber
+        let bottomVal = CGFloat(Float((bottomNum?.floatValue)!))
         let bottom = NSLayoutConstraint(item: viewCarousel,
                                         attribute: .bottom,
                                         relatedBy: .equal,
@@ -324,18 +324,18 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
             }
             //add new bottom button
             self.button = buttonTarget
-            let widthStr = self.dictCarousel?["button_width"] as? String
-            var width = CGFloat((Float(widthStr ?? "") ?? 0.0))
-            let heightStr = self.dictCarousel?["button_height"] as? String
-            let height = CGFloat((Float(heightStr ?? "") ?? 0.0))
-            let marginTopStr = self.dictCarousel?["button_margin_top"] as? String
-            let marginTop = CGFloat((Float(marginTopStr ?? "") ?? 0.0))
-            let marginBottomStr = self.dictCarousel?["button_margin_bottom"] as? String
-            let marginBottom = CGFloat((Float(marginBottomStr ?? "") ?? 0.0))
-            let marginLeftStr = self.dictCarousel?["button_margin_left"] as? String
-            let marginLeft = CGFloat((Float(marginLeftStr ?? "") ?? 0.0))
-            let marginRightStr = self.dictCarousel?["button_margin_right"] as? String
-            let marginRight = CGFloat((Float(marginRightStr ?? "") ?? 0.0))
+            let widthNum = tipItem["button_width"] as? NSNumber
+            var width = CGFloat((widthNum?.floatValue)!)
+            let heightNum = tipItem["button_height"] as? NSNumber
+            let height = CGFloat(Float((heightNum?.floatValue)!))
+            let marginTopNumber = tipItem["button_margin_top"] as? NSNumber
+            let marginTop = CGFloat(Float((marginTopNumber?.floatValue)!))
+            let marginBottomNum = tipItem["button_margin_bottom"] as? NSNumber
+            let marginBottom = CGFloat(Float((marginBottomNum?.floatValue)!))
+            let marginLeftNum = tipItem["button_margin_left"] as? NSNumber
+            let marginLeft = CGFloat(Float((marginLeftNum?.floatValue)!))
+            let marginRightNum = tipItem["button_margin_right"] as? NSNumber
+            let marginRight = CGFloat(Float((marginRightNum?.floatValue)!))
             let sizeContain: CGSize = self.viewCarouselContainer!.frame.size
             self.constraintBottom?.constant = -(marginTop + height + marginBottom)
             if width > 0 && width <= 1
