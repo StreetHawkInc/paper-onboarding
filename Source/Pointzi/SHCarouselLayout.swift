@@ -19,29 +19,60 @@
  * License along with this library.
  */
 
-class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate {
-    func onboardingWillTransitonToIndex(_ index: Int) {
+class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
+{
+    func onboardingItemsCount() -> Int
+    {
+        let arrayItems = self.dictCarousel?["items"] as! NSArray
+        return arrayItems.count
+    }
+    
+    func onboardingItemAtIndex(_ index: Int) -> OnboardingItemInfo
+    {
+        let item = OnboardingItemInfo()
+        let arrayItems = self.dictCarousel?["items"] as! NSArray
+        let tipItem : NSDictionary = arrayItems[index] as! NSDictionary
+        item.shImage = tipItem["image"] as? UIImage
+        item.shImageSource = tipItem["imageSource"] as? String
+        item.shTitle = tipItem["titleText"] as? String
+        item.shDesc = tipItem["contentText"] as? String
+        item.shIcon = tipItem["icon"] as? UIImage
+        item.shIconSource = tipItem["iconSource"] as? String
+        let backgroundColor = tipItem["backgroundColor"] as? String
+        item.shColor = SHCarouselLayout.color(from: backgroundColor)
+        let titlesColor = tipItem["titleColor"] as? String
+        item.shTitleColor = SHCarouselLayout.color(from: titlesColor)
+        let contentColor = tipItem["contentColor"] as? String
+        item.shDescriptionColor = SHCarouselLayout.color(from: contentColor)
+        item.shTitleFont = tipItem["titleFont"] as? UIFont
+        item.shDescriptionFont = tipItem["contentFont"] as? UIFont
+        return item
+    }
+    
+    func onboardingWillTransitonToIndex(_ index: Int)
+    {
         //Paper onboarding's animation is 0.5 duration, be consistent and looks good
         UIView.animate(withDuration: 0.5, animations: {() -> Void in
-            let arrayItems = self.dictCarousel["items"] as! NSArray
+            let arrayItems = self.dictCarousel?["items"] as! NSArray
             let tipItem : NSDictionary = arrayItems[index] as! NSDictionary
-            let backgroundColorStr = tipItem["backgroundColor"] as! String
+            let backgroundColorStr = tipItem["backgroundColor"] as? String
             self.viewCarouselContainer?.backgroundColor = SHCarouselLayout.color(from: backgroundColorStr)
         })
         sendFeedResult(for: index)
-
     }
     
-    func onboardingDidTransitonToIndex(_ index: Int) {
+    func onboardingDidTransitonToIndex(_ index: Int)
+    {
         self.layoutButton(for: index)
     }
     
-    func onboardingConfigurationItem(_ item: OnboardingContentViewItem, index: Int) {
+    func onboardingConfigurationItem(_ item: OnboardingContentViewItem, index: Int)
+    {
         
     }
     
     var viewTip: UIView?
-    var dictCarousel : NSDictionary
+    var dictCarousel : NSDictionary?
     var viewCarouselContainer: UIView?
     var constraintBottom: NSLayoutConstraint?
     var button: UIButton?
@@ -50,27 +81,26 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate {
     static let AARRGGBB_COLOUR_CODE_LEN = 8
     
     init() {
+        
     }
     
-    func layoutCarousel(on viewContent: UIView, forTip dictCarousel: NSDictionary) {
-        let arrayItems = dictCarousel["items"] as! NSArray
+    func layoutCarousel(on viewContent: UIView, forTip dictCarousel: NSDictionary)
+    {
+        let arrayItems : NSArray = dictCarousel["items"] as! NSArray
         //here get something to show
-        button = nil
-        //clear
-        viewTip = viewContent
+        self.button = nil //clear
+        self.viewTip = viewContent
         self.dictCarousel = dictCarousel
-        let viewCarousel = UIView()
-        //viewCarousel has shadow
-        viewCarouselContainer = UIView()
-        //viewCarouselContainer doesn't have shadow
+        let viewCarousel = UIView() //viewCarousel has shadow
+        self.viewCarouselContainer = UIView() //viewCarouselContainer doesn't have shadow
         viewContent.addSubview(viewCarousel)
-        viewCarousel.addSubview(viewCarouselContainer!)
+        viewCarousel.addSubview(self.viewCarouselContainer!)
         //must have this otherwise constraints cannot work
         viewCarousel.translatesAutoresizingMaskIntoConstraints = false
-        viewCarouselContainer?.translatesAutoresizingMaskIntoConstraints = false
+        self.viewCarouselContainer?.translatesAutoresizingMaskIntoConstraints = false
         viewContent.sendSubview(toBack: viewCarousel)
         let colorStr = dictCarousel["borderColor"] as? String
-        let borderColor: UIColor? = SHCarouselLayout.color(from: colorStr!)
+        let borderColor: UIColor? = SHCarouselLayout.color(from: colorStr)
         viewCarousel.layer.borderColor = borderColor?.cgColor
         let borderStr = dictCarousel["borderWidth"] as? String
         viewCarousel.layer.borderWidth = CGFloat((Float(borderStr ?? "") ?? 0.0))
@@ -87,13 +117,15 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate {
         viewCarouselContainer?.clipsToBounds = true //limit content even with shadow
         let boxShadowStr = dictCarousel["boxShadow"] as? String
         let boxShadow = CGFloat((Float(boxShadowStr ?? "") ?? 0.0))
-        if boxShadow == 0 {
+        if boxShadow == 0
+        {
             //clipsToBounds and masksToBound not co-work well.
             //when masksToBound=NO it doesn't show shadow,
             //however when masksToBound=YES the subviews go out of bound.
             viewCarousel.clipsToBounds = true
         }
-        else {
+        else
+        {
             viewCarousel.layer.shadowOffset = CGSize(width: boxShadow, height: boxShadow)
             viewCarousel.layer.shadowOpacity = 0.5
             viewCarousel.layer.shadowRadius = cornerRadius
@@ -131,7 +163,7 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate {
                                              multiplier: 1.0,
                                              constant: 0)
         viewCarousel.addConstraint(bottomInner)
-        constraintBottom = bottomInner
+        self.constraintBottom = bottomInner
         let leadingStr = dictCarousel["margin.left"] as? String
         let leadingVal = CGFloat((Float(leadingStr ?? "") ?? 0.0))
         let leading = NSLayoutConstraint(item: viewCarousel,
@@ -206,126 +238,135 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate {
         viewCarousel.addConstraint(bottomContainer)
         sendFeedResult(for: 0)
         let tipItem : NSDictionary = arrayItems[0] as! NSDictionary
-        let backgroundColorStr = tipItem["backgroundColor"] as! String
+        let backgroundColorStr = tipItem["backgroundColor"] as? String
         let backgroundColor: UIColor? = SHCarouselLayout.color(from: backgroundColorStr)
-        viewCarouselContainer?.backgroundColor = backgroundColor
+        self.viewCarouselContainer?.backgroundColor = backgroundColor
         //layout button in a delay to get parent frame ready
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(__int64_t(0.1 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC), execute: {() -> Void in
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + Double(__int64_t(0.1 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC),
+                                      execute: {() -> Void in
             self.layoutButton(for: 0)
         })
     }
     
-    func onboardingItemsCount() -> Int {
-        let arrayItems = dictCarousel["items"] as! [NSArray]
-        return arrayItems.count
-    }
-    
-    func onboardingItemAtIndex(_ index: Int) -> OnboardingItemInfo {
-        let item = OnboardingItemInfo();
-        let arrayItems = dictCarousel["items"] as! NSArray
-        let tipItem : NSDictionary = arrayItems[index] as! NSDictionary
-        item.shImage = tipItem["image"] as? UIImage
-        item.shImageSource = tipItem["imageSource"] as? String
-        item.shTitle = tipItem["titleText"] as? String
-        item.shDesc = tipItem["contentText"] as? String
-        item.shIcon = tipItem["icon"] as? UIImage
-        item.shIconSource = tipItem["iconSource"] as? String
-        let backgroundColor = tipItem["backgroundColor"] as? String
-        item.shColor = SHCarouselLayout.color(from: backgroundColor!)
-        let titlesColor = tipItem["titleColor"] as? String
-        item.shTitleColor = SHCarouselLayout.color(from: titlesColor!)
-        let contentColor = tipItem["contentColor"] as? String
-        item.shDescriptionColor = SHCarouselLayout.color(from: contentColor!)
-        item.shTitleFont = tipItem["titleFont"] as? UIFont
-        item.shDescriptionFont = tipItem["contentFont"] as? UIFont
-        return item;
-    }
-
-    class func color(from str: String) -> UIColor {
-        if (str.lengthOfBytes(using: String.Encoding.utf8) == AARRGGBB_COLOUR_CODE_LEN + 1) {
-            var red : CGFloat = -1
-            var green : CGFloat = -1
-            var blue : CGFloat = -1
-            var alpha : CGFloat = -1
-            let scanner = Scanner.init(string: str)
-            scanner.scanLocation = 1 // bypass '#' character
-            var rgbValue : UInt32 = 0
-            scanner.scanHexInt32(&rgbValue)
-            red = CGFloat((rgbValue & 0xFF0000) >> 16)/255.0;
-            green = CGFloat((rgbValue & 0xFF00) >> 8)/255.0;
-            blue = CGFloat(rgbValue & 0xFF)/255.0;
-            alpha = CGFloat((rgbValue & 0xFF000000) >> 24)/255.0;
-            if (red >= 0 && red <= 1
-                && green >= 0 && green <= 1
-                && blue >= 0 && blue <= 1
-                && alpha >= 0 && alpha <= 1)
+    class func color(from str: String?) -> UIColor?
+    {
+        if let strColor = str
+        {
+            if (strColor.lengthOfBytes(using: String.Encoding.utf8) == AARRGGBB_COLOUR_CODE_LEN + 1)
             {
-                return UIColor.init(red: red, green: green, blue: blue, alpha: alpha)
-            }
-            else
-            {
-                return UIColor.clear
+                var red : CGFloat = -1
+                var green : CGFloat = -1
+                var blue : CGFloat = -1
+                var alpha : CGFloat = -1
+                let scanner = Scanner.init(string: strColor)
+                scanner.scanLocation = 1 // bypass '#' character
+                var rgbValue : UInt32 = 0
+                scanner.scanHexInt32(&rgbValue)
+                red = CGFloat((rgbValue & 0xFF0000) >> 16)/255.0;
+                green = CGFloat((rgbValue & 0xFF00) >> 8)/255.0;
+                blue = CGFloat(rgbValue & 0xFF)/255.0;
+                alpha = CGFloat((rgbValue & 0xFF000000) >> 24)/255.0;
+                if (red >= 0 && red <= 1
+                    && green >= 0 && green <= 1
+                    && blue >= 0 && blue <= 1
+                    && alpha >= 0 && alpha <= 1)
+                {
+                    return UIColor.init(red: red, green: green, blue: blue, alpha: alpha)
+                }
+                else
+                {
+                    return nil
+                }
             }
         }
-        return UIColor.clear
+        return nil
     }
     
-    private func sendFeedResult(for index: Int) {
-        let arrayItems = dictCarousel["items"] as! NSArray
+    private func sendFeedResult(for index: Int)
+    {
+        let arrayItems = self.dictCarousel?["items"] as! NSArray
         let tipItem : NSDictionary = arrayItems[index] as! NSDictionary
-        let dict = ["feed_id": dictCarousel["feed_id"]!,
+        let dict = ["feed_id": self.dictCarousel?["feed_id"]!,
                     "result": 1,
                     "step_id": tipItem["suid"]!,
                     "delete": false,
                     "complete": false]
-        NotificationCenter.default.post(name: NSNotification.Name("SH_PointziBridge_FeedResult_Notification"), object: self, userInfo:dict)
+        NotificationCenter.default.post(name: NSNotification.Name("SH_PointziBridge_FeedResult_Notification"),
+                                        object: self,
+                                        userInfo:dict as Any as? [AnyHashable : Any])
     }
     
-    private func layoutButton(for index: Int) {
-        let tipItem = ((dictCarousel["items"] as? [Any])[index]) as? [AnyHashable: Any]
+    private func layoutButton(for index: Int)
+    {
+        let arrayItems = self.dictCarousel?["items"] as! NSArray
+        let tipItem : NSDictionary = arrayItems[index] as! NSDictionary
         let buttonTarget = tipItem["button_obj"] as? UIButton
-        if buttonTarget == nil && button != nil {
-            button?.removeFromSuperview()
-            button = nil
-            constraintBottom.constant = 0
+        if (buttonTarget == nil && self.button != nil)
+        {
+            self.button?.removeFromSuperview()
+            self.button = nil
+            self.constraintBottom?.constant = 0
         }
-        else if buttonTarget != nil {
-            assert(buttonTarget.tag == index, "Wrong tag for button")
-            if button != nil {
+        else if (buttonTarget != nil)
+        {
+            assert(buttonTarget!.tag == index, "Wrong tag for button")
+            if (self.button != nil)
+            {
                 //tag is index, it's same so nothing to do
-                if buttonTarget.tag == button.tag {
+                if (buttonTarget!.tag == self.button!.tag)
+                {
                     return
                 }
-                else {
-                    button.removeFromSuperview()
+                else
+                {
+                    self.button!.removeFromSuperview()
                 }
             }
             //add new bottom button
-            button = buttonTarget
-            var width = CGFloat(Float(tipItem["button_width"]))
-            let height = CGFloat(Float(tipItem["button_height"]))
-            let marginTop = CGFloat(Float(tipItem["button_margin_top"]))
-            let marginBottom = CGFloat(Float(tipItem["button_margin_bottom"]))
-            let marginLeft = CGFloat(Float(tipItem["button_margin_left"]))
-            let marginRight = CGFloat(Float(tipItem["button_margin_right"]))
-            let sizeContain: CGSize = viewCarouselContainer.frame.size
-            constraintBottom.constant = -(marginTop + height + marginBottom)
-            if width > 0 && width <= 1 {
+            self.button = buttonTarget
+            let widthStr = self.dictCarousel?["button_width"] as? String
+            var width = CGFloat((Float(widthStr ?? "") ?? 0.0))
+            let heightStr = self.dictCarousel?["button_height"] as? String
+            let height = CGFloat((Float(heightStr ?? "") ?? 0.0))
+            let marginTopStr = self.dictCarousel?["button_margin_top"] as? String
+            let marginTop = CGFloat((Float(marginTopStr ?? "") ?? 0.0))
+            let marginBottomStr = self.dictCarousel?["button_margin_bottom"] as? String
+            let marginBottom = CGFloat((Float(marginBottomStr ?? "") ?? 0.0))
+            let marginLeftStr = self.dictCarousel?["button_margin_left"] as? String
+            let marginLeft = CGFloat((Float(marginLeftStr ?? "") ?? 0.0))
+            let marginRightStr = self.dictCarousel?["button_margin_right"] as? String
+            let marginRight = CGFloat((Float(marginRightStr ?? "") ?? 0.0))
+            let sizeContain: CGSize = self.viewCarouselContainer!.frame.size
+            self.constraintBottom?.constant = -(marginTop + height + marginBottom)
+            if width > 0 && width <= 1
+            {
                 width = sizeContain.width * width
             }
-            else if width == 0 {
+            else if width == 0
+            {
                 width = sizeContain.width
             }
-            
-            viewCarouselContainer.addSubview(buttonTarget)
-            if marginLeft == 0 && marginRight == 0 {
-                buttonTarget.frame = CGRect(x: (sizeContain.width - width) / 2, y: sizeContain.height - marginBottom - height, width: width, height: height)
+            self.viewCarouselContainer?.addSubview(buttonTarget!)
+            if marginLeft == 0 && marginRight == 0
+            {
+                buttonTarget!.frame = CGRect(x: (sizeContain.width - width) / 2,
+                                             y: sizeContain.height - marginBottom - height,
+                                             width: width,
+                                             height: height)
             }
-            else if marginLeft != 0 {
-                buttonTarget.frame = CGRect(x: marginLeft, y: sizeContain.height - marginBottom - height, width: width, height: height)
+            else if marginLeft != 0
+            {
+                buttonTarget!.frame = CGRect(x: marginLeft,
+                                             y: sizeContain.height - marginBottom - height,
+                                             width: width,
+                                             height: height)
             }
-            else if marginRight != 0 {
-                buttonTarget.frame = CGRect(x: sizeContain.width - marginRight - width, y: sizeContain.height - marginBottom - height, width: width, height: height)
+            else if marginRight != 0
+            {
+                buttonTarget!.frame = CGRect(x: sizeContain.width - marginRight - width,
+                                             y: sizeContain.height - marginBottom - height,
+                                             width: width,
+                                             height: height)
             }
         }
     }
