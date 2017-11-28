@@ -7,10 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		4DB5B0DB1FA57DE300304CBC /* SHCarouselBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DB5B0D91FA57DE300304CBC /* SHCarouselBridge.h */; };
-		4DB5B0DC1FA57DE300304CBC /* SHCarouselBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB5B0DA1FA57DE300304CBC /* SHCarouselBridge.m */; };
-		4DB5B0E61FA5852300304CBC /* SHCarouselLayout.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DB5B0E41FA5852300304CBC /* SHCarouselLayout.h */; };
-		4DB5B0E71FA5852300304CBC /* SHCarouselLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB5B0E51FA5852300304CBC /* SHCarouselLayout.m */; };
+		4D7632251FCD43C700EE17AB /* SHCarouselBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7632231FCD43C700EE17AB /* SHCarouselBridge.swift */; };
+		4D7632261FCD43C700EE17AB /* SHCarouselLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7632241FCD43C700EE17AB /* SHCarouselLayout.swift */; };
 		7C4C71151ECAA8DC0012B00B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7C4C71141ECAA8DC0012B00B /* Assets.xcassets */; };
 		845C48C21CFDB2F7002BE949 /* PaperOnboarding.h in Headers */ = {isa = PBXBuildFile; fileRef = 845C48C11CFDB2F7002BE949 /* PaperOnboarding.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		845C48CB1CFDB317002BE949 /* PaperOnboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84C7E5CD1CCE571800C9F001 /* PaperOnboarding.swift */; };
@@ -26,10 +24,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		4DB5B0D91FA57DE300304CBC /* SHCarouselBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SHCarouselBridge.h; sourceTree = "<group>"; };
-		4DB5B0DA1FA57DE300304CBC /* SHCarouselBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SHCarouselBridge.m; sourceTree = "<group>"; };
-		4DB5B0E41FA5852300304CBC /* SHCarouselLayout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SHCarouselLayout.h; sourceTree = "<group>"; };
-		4DB5B0E51FA5852300304CBC /* SHCarouselLayout.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SHCarouselLayout.m; sourceTree = "<group>"; };
+		4D7632231FCD43C700EE17AB /* SHCarouselBridge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SHCarouselBridge.swift; sourceTree = "<group>"; };
+		4D7632241FCD43C700EE17AB /* SHCarouselLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SHCarouselLayout.swift; sourceTree = "<group>"; };
 		7C4C71141ECAA8DC0012B00B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		843A19641CD0B49E00F37344 /* Images.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Images.swift; sourceTree = "<group>"; };
 		845C48BF1CFDB2F7002BE949 /* PaperOnboarding.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PaperOnboarding.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -64,16 +60,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		4DB5B0D81FA57DC400304CBC /* Pointzi */ = {
+		4D7632221FCD43C700EE17AB /* Pointzi */ = {
 			isa = PBXGroup;
 			children = (
-				4DB5B0D91FA57DE300304CBC /* SHCarouselBridge.h */,
-				4DB5B0DA1FA57DE300304CBC /* SHCarouselBridge.m */,
-				4DB5B0E41FA5852300304CBC /* SHCarouselLayout.h */,
-				4DB5B0E51FA5852300304CBC /* SHCarouselLayout.m */,
+				4D7632231FCD43C700EE17AB /* SHCarouselBridge.swift */,
+				4D7632241FCD43C700EE17AB /* SHCarouselLayout.swift */,
 			);
-			name = Pointzi;
-			path = ../Pointzi;
+			path = Pointzi;
 			sourceTree = "<group>";
 		};
 		4DB5B0DD1FA57F5500304CBC /* Frameworks */ = {
@@ -120,7 +113,6 @@
 		84A773971CCE545200EF4EB0 = {
 			isa = PBXGroup;
 			children = (
-				4DB5B0D81FA57DC400304CBC /* Pointzi */,
 				843A19631CD0B42100F37344 /* Constants */,
 				84C7E5F31CCE59B200C9F001 /* Fonts */,
 				847CEA501CFC88F500AB132D /* Paper-onboarding */,
@@ -143,6 +135,7 @@
 		84C7E5CC1CCE549F00C9F001 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				4D7632221FCD43C700EE17AB /* Pointzi */,
 				84C7E6001CCE59BD00C9F001 /* GestureControl */,
 				84C7E5EF1CCE59A400C9F001 /* FillAnimatinView */,
 				84C7E5E41CCE594000C9F001 /* OnboardingContantView */,
@@ -240,9 +233,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4DB5B0DB1FA57DE300304CBC /* SHCarouselBridge.h in Headers */,
 				845C48C21CFDB2F7002BE949 /* PaperOnboarding.h in Headers */,
-				4DB5B0E61FA5852300304CBC /* SHCarouselLayout.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -317,16 +308,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4DB5B0E71FA5852300304CBC /* SHCarouselLayout.m in Sources */,
 				845C48CE1CFDB325002BE949 /* PageViewItem.swift in Sources */,
 				845C48CF1CFDB32A002BE949 /* ConstraintsHalper.swift in Sources */,
 				845C48CB1CFDB317002BE949 /* PaperOnboarding.swift in Sources */,
 				845C48D11CFDB332002BE949 /* OnboardingContentView.swift in Sources */,
-				4DB5B0DC1FA57DE300304CBC /* SHCarouselBridge.m in Sources */,
+				4D7632261FCD43C700EE17AB /* SHCarouselLayout.swift in Sources */,
 				845C48D31CFDB33D002BE949 /* FillAnimationView.swift in Sources */,
 				845C48D01CFDB32D002BE949 /* Configuring.swift in Sources */,
 				845C48CD1CFDB321002BE949 /* PageContainer.swift in Sources */,
 				845C48D41CFDB342002BE949 /* GestureControl.swift in Sources */,
+				4D7632251FCD43C700EE17AB /* SHCarouselBridge.swift in Sources */,
 				845C48D21CFDB337002BE949 /* OnboardingContantViewItem.swift in Sources */,
 				845C48CC1CFDB31C002BE949 /* PageView.swift in Sources */,
 			);
