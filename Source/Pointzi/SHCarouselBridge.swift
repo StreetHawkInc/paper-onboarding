@@ -16,7 +16,9 @@
  * License along with this library.
  */
 
-class SHCarouselBridge {
+@objc(SHCarouselBridge)
+class SHCarouselBridge : NSObject
+{
     //for layout carousel in the given view.
     //notification name: SH_CarouselBridge_LayoutCarousel; user info: @{@"view": view_content, @"tip": dictTip}].
     
