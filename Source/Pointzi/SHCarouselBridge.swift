@@ -20,15 +20,17 @@ class SHCarouselBridge {
     //for layout carousel in the given view.
     //notification name: SH_CarouselBridge_LayoutCarousel; user info: @{@"view": view_content, @"tip": dictTip}].
     
-    class func layoutCarouselHandler(_ notification: Notification) {
-        let viewContent = notification.userInfo["view"] as? UIView
+    @objc class func layoutCarouselHandler(_ notification: Notification) {
+        let viewContent = notification.userInfo!["view"] as! UIView
         //tip controller's content view
-        let dictTip = notification.userInfo["tip"]
-        SHCarouselLayout.sharedInstance().layoutCarousel(on: viewContent, forTip: dictTip)
+        let dictTip = notification.userInfo!["tip"] as! NSDictionary
+        SHCarouselLayout.sharedInstance.layoutCarousel(on: viewContent, forTip: dictTip)
     }
     
     class func bridgeHandler(_ notification: Notification) {
-        NotificationCenter.default.addObserver(self, selector: #selector(self.layoutCarouselHandler), name: "SH_CarouselBridge_LayoutCarousel", object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.layoutCarouselHandler),
+                                               name: NSNotification.Name(rawValue: "SH_CarouselBridge_LayoutCarousel"),
+                                               object: nil)
     }
     
     // MARK: - private functions
