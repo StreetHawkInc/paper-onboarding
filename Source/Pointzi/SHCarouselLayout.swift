@@ -182,7 +182,7 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
                                           toItem: viewContent,
                                           attribute: .trailing,
                                           multiplier: 1.0,
-                                          constant: trailingVal)
+                                          constant: -trailingVal)
         viewContent.addConstraint(trailing)
         let topNum = dictCarousel["margin.top"] as? NSNumber
         let topVal = CGFloat(Float((topNum?.floatValue)!))
@@ -202,7 +202,7 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
                                         toItem: viewContent,
                                         attribute: .bottom,
                                         multiplier: 1.0,
-                                        constant: bottomVal)
+                                        constant: -bottomVal)
         viewContent.addConstraint(bottom)
         let leadingContainer = NSLayoutConstraint(item: viewCarouselContainer!,
                                                   attribute: .leading,
