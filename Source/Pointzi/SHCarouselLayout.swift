@@ -275,11 +275,11 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
                 }
                 else
                 {
-                    return nil
+                    return UIColor.clear
                 }
             }
         }
-        return nil
+        return UIColor.clear
     }
     
     private func sendFeedResult(for index: Int)
