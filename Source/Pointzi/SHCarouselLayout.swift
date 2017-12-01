@@ -63,7 +63,32 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
     
     func onboardingDidTransitonToIndex(_ index: Int)
     {
+        //add carousel's inner button
         self.layoutButton(for: index)
+        //sends notification in case image newly download
+        //must use in DidTransitonToIndex to match exact index
+        let arrayItems = self.dictCarousel?["items"] as! NSArray
+        let tipItem : NSDictionary = arrayItems[index] as! NSDictionary
+        let image : UIImage? = tipItem["image"] as? UIImage
+        let imageSource : String? = tipItem["imageSource"] as? String
+        if (image != nil && imageSource != nil)
+        {
+            let dictInfo : NSDictionary = ["source": imageSource!,
+                                           "image": image!]
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "SH_PrepareImage"),
+                                            object: self,
+                                            userInfo: (dictInfo as! [AnyHashable : Any]))
+        }
+        let icon : UIImage? = tipItem["icon"] as? UIImage
+        let iconSource : String? = tipItem["iconSource"] as? String
+        if (icon != nil && iconSource != nil)
+        {
+            let dictInfo : NSDictionary = ["source": iconSource!,
+                                           "image": icon!]
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "SH_PrepareImage"),
+                                            object: self,
+                                            userInfo: (dictInfo as! [AnyHashable : Any]))
+        }
     }
     
     func onboardingConfigurationItem(_ item: OnboardingContentViewItem, index: Int)
@@ -81,7 +106,66 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
     static let AARRGGBB_COLOUR_CODE_LEN = 8
     
     init() {
-        
+        //add notification for update image when fetched later
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(self.prepareImage(notification:)),
+                                               name: NSNotification.Name(rawValue: "SH_PrepareImage"),
+                                               object: nil)
+    }
+    
+    @objc func prepareImage(notification: NSNotification) {
+        if let dict = self.dictCarousel
+        {
+            let imageSourceNotification : String = notification.userInfo!["source"] as! String
+            let arrayItems = dict["items"] as! NSArray
+            var i = 0
+            var isChanged : Bool = false
+            while i < arrayItems.count && !isChanged
+            {
+                let tipItem : NSDictionary = arrayItems[i] as! NSDictionary
+                if let imageSource = tipItem["imageSource"] as? String
+                {
+                    if (imageSource.compare(imageSourceNotification) == ComparisonResult.orderedSame)
+                    {
+                        let image = tipItem["image"] as? UIImage
+                        if (image == nil) //if already has image, not need to check
+                        {
+                            let dictItemMutable : NSMutableDictionary = NSMutableDictionary.init(dictionary: tipItem)
+                            dictItemMutable["image"] = notification.userInfo!["image"] as! UIImage
+                            let arrayItemMutable = NSMutableArray.init(array: arrayItems)
+                            let index = arrayItemMutable.index(of: tipItem)
+                            arrayItemMutable.remove(tipItem)
+                            arrayItemMutable.insert(dictItemMutable, at: index)
+                            let dictCarouselMutable : NSMutableDictionary = NSMutableDictionary.init(dictionary: dict)
+                            dictCarouselMutable["items"] = arrayItemMutable
+                            self.dictCarousel = dictCarouselMutable
+                            isChanged = true
+                        }
+                    }
+                }
+                if let iconSource = tipItem["iconSource"] as? String
+                {
+                    if (iconSource.compare(imageSourceNotification) == ComparisonResult.orderedSame)
+                    {
+                        let icon = tipItem["icon"] as? UIImage
+                        if (icon == nil) //if already has image, not need to check
+                        {
+                            let dictItemMutable : NSMutableDictionary = NSMutableDictionary.init(dictionary: tipItem)
+                            dictItemMutable["icon"] = notification.userInfo!["image"] as! UIImage
+                            let arrayItemMutable = NSMutableArray.init(array: arrayItems)
+                            let index = arrayItemMutable.index(of: tipItem)
+                            arrayItemMutable.remove(tipItem)
+                            arrayItemMutable.insert(dictItemMutable, at: index)
+                            let dictCarouselMutable : NSMutableDictionary = NSMutableDictionary.init(dictionary: dict)
+                            dictCarouselMutable["items"] = arrayItemMutable
+                            self.dictCarousel = dictCarouselMutable
+                            isChanged = true
+                        }
+                    }
+                }
+                i = i + 1
+            }
+        }
     }
     
     func layoutCarousel(on viewContent: UIView, forTip dictCarousel: NSDictionary)

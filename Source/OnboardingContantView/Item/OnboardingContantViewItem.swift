@@ -40,13 +40,16 @@ extension OnboardingContentViewItem {
         if (self.imageView?.image == nil) //if already has image, not need to check
         {
             //there is a image source for this item
-            if let sourceLength = self.imageSource?.lengthOfBytes(using: String.Encoding.utf8), sourceLength > 0 {
-                let imageSource = notification.userInfo!["source"]
-                //it's same image source, so set the image
-                if (self.imageSource?.compare(imageSource as! String) == ComparisonResult.orderedSame)
+            if let imageSource = self.imageSource
+            {
+                if (imageSource.lengthOfBytes(using: String.Encoding.utf8) > 0)
                 {
-                    DispatchQueue.main.async {
-                        self.imageView?.image = notification.userInfo!["image"] as? UIImage
+                    let imageSourceNotification = notification.userInfo!["source"] as! String
+                    if (imageSource.compare(imageSourceNotification) == ComparisonResult.orderedSame)
+                    {
+                        DispatchQueue.main.async {
+                            self.imageView?.image = notification.userInfo!["image"] as? UIImage
+                        }
                     }
                 }
             }
