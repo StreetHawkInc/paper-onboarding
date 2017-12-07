@@ -75,16 +75,21 @@ extension PageContrainer {
   
   fileprivate func createItems(_ count: Int, radius: CGFloat, selectedRadius: CGFloat) -> [PageViewItem] {
     var items = [PageViewItem]()
-    // create first item 
+    // create first item
+    var tag = 1
     var item = createItem(radius, selectedRadius: selectedRadius, isSelect: true)
+    item.tag = tag
+    
     addConstraintsToView(item, radius: selectedRadius)
     items.append(item)
     
     for _ in 1..<count {
+      tag += 1
       let nextItem = createItem(radius, selectedRadius: selectedRadius)
       addConstraintsToView(nextItem, leftItem: item, radius: radius)
       items.append(nextItem)
       item = nextItem
+      item.tag = tag
     }
     return items
   }
