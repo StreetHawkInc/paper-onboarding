@@ -2,7 +2,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "paper-onboarding-pointzi"
-  s.version      = "1.1.2"
+  s.version      = "1.1.3"
   s.summary      = "Amazing onboarding."
   s.license      = 'MIT'
   s.homepage     = 'https://github.com/StreetHawkInc/paper-onboarding.git'
