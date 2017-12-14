@@ -27,7 +27,7 @@ class PageViewItem: UIView {
     self.borderColor = borderColor
     self.lineWidth = lineWidth
     self.circleRadius = radius
-    self.selectedCircleRadius = selectedRadius
+    self.selectedCircleRadius = 0 //Selected item not show circle, to keep consistent with dashboard
     self.select = isSelect
     super.init(frame: CGRect.zero)
     commonInit()
