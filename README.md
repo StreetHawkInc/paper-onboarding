@@ -1,26 +1,13 @@
 ![header](./header.png)
-![animation](./preview.gif)
 
 # paper-onboarding
-[![Twitter](https://img.shields.io/badge/Twitter-@Ramotion-blue.svg?style=flat)](http://twitter.com/Ramotion)
-[![CocoaPods](https://img.shields.io/cocoapods/p/paper-onboarding.svg)](https://cocoapods.org/pods/paper-onboarding)
-[![CocoaPods](https://img.shields.io/cocoapods/v/paper-onboarding.svg)](http://cocoapods.org/pods/paper-onboarding)
-[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Ramotion/paper-onboarding)
-[![Travis](https://img.shields.io/travis/Ramotion/paper-onboarding.svg)](https://travis-ci.org/Ramotion/paper-onboarding)
-[![codebeat badge](https://codebeat.co/badges/d06237c6-6ff7-4560-9602-b6cc65063383)](https://codebeat.co/projects/github-com-ramotion-paper-onboarding)
-
+[![Twitter](https://img.shields.io/badge/Twitter-%40usepointzi-blue.svg)](https://twitter.com/usepointzi)
 
 ## About
-This project is maintained by Ramotion, Inc.<br>
-We specialize in the designing and coding of custom UI for Mobile Apps and Websites.<br>
+This project is maintained by Pointzi from the original creation by Ramotion Inc.<br>
+This fork of the popular Paper Onboarding carousel (or slider) allows you to update the images, design and content WITHOUT re-releasing the App.<br>
 
-**Looking for developers for your project?**<br>
-This project is maintained by Ramotion, Inc. We specialize in the designing and coding of custom UI for Mobile Apps and Websites.
-
-<a href="https://ramotion.com/?utm_source=gthb&utm_medium=special&utm_campaign=paper-onboarding-contact-us/#Get_in_Touch"> 
-<img src="https://github.com/ramotion/gliding-collection/raw/master/contact_our_team@2x.png" width="187" height="34"></a> <br>
-
-The [iPhone mockup](https://store.ramotion.com?utm_source=gthb&utm_medium=special&utm_campaign=paper-onboarding) available [here](https://store.ramotion.com?utm_source=gthb&utm_medium=special&utm_campaign=paper-onboarding).
+The code has been modified to remove hard-coded JSON and instead create an account at https://dashboard.pointzi.com and change the content/design there. 
 
 ## Requirements
 
@@ -29,19 +16,34 @@ The [iPhone mockup](https://store.ramotion.com?utm_source=gthb&utm_medium=specia
 
 ## Installation
 
-Just add the Source folder to your project.
+Open pod file, add pod dependency.
 
 or use [CocoaPods](https://cocoapods.org) with Podfile:
 ``` ruby
-pod 'paper-onboarding', '~> 1.1.3' swift 2.2
+platform :ios, '8.0'
 
-pod 'paper-onboarding', '~> 2.0.1' swift 3
-```
+use_frameworks! # This line is compulsory, as "paper-onboarding-pointzi" is a swift pod
 
-or [Carthage](https://github.com/Carthage/Carthage) users can simply add to their `Cartfile`:
+target 'PointziDemo' do # Replace with your target if you have one
+
+pod "pointzi"
+pod "paper-onboarding-pointzi"  # Add this pod if you wish to use carousel
+
+end
+
 ```
-github "Ramotion/paper-onboarding"
-```
+Run pod update.
+
+Now you can design your beautiful carousels.  
+
+#### Without CocoaPod
+
+Download pointzi paper onboarding source code from https://gitlab.com/pointzi/sdks/paper-onboarding-ios.git
+
+Drag & drop source folder into your app project.
+
+Now you are ready to design your beautiful carousels.
+
 
 ## Usage
 
@@ -103,6 +105,10 @@ func onboardingConfigurationItem(item: OnboardingContentViewItem, index: Int) {
 //    item.imageView = ...
   }
 ```
+
+## Demo
+![animation](./preview.gif)
+
 ## License
 
 paper-onboarding is released under the MIT license.
@@ -110,17 +116,14 @@ See [LICENSE](./LICENSE) for details.
 
 <br>
 
-# Get the Showroom App for iOS to give it a try
-Try this UI component and more like this in our iOS app. Contact us if interested.
-
-<a href="https://itunes.apple.com/app/apple-store/id1182360240?pt=550053&ct=paper-onboarding&mt=8" > 
-<img src="https://github.com/ramotion/gliding-collection/raw/master/app_store@2x.png" width="117" height="34"></a>
-
-<a href="https://ramotion.com/?utm_source=gthb&utm_medium=special&utm_campaign=paper-onboarding-contact-us/#Get_in_Touch"> 
-<img src="https://github.com/ramotion/gliding-collection/raw/master/contact_our_team@2x.png" width="187" height="34"></a>
-<br>
-<br>
-
 Follow us for the latest updates<br>
-[![Twitter URL](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=https://github.com/ramotion/paper-onboarding)
-[![Twitter Follow](https://img.shields.io/twitter/follow/ramotion.svg?style=social)](https://twitter.com/ramotion)
+[![Twitter URL](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=https://gitlab.com/pointzi/sdks/paper-onboarding-ios)
+[![Twitter Follow](https://img.shields.io/twitter/follow/usepointzi.svg?label=%40usepointzi&style=social)](https://twitter.com/usepointzi)
+
+
+## Keywords
+iOS Swift Slider Infoslider Introslider Whatfix NPS Feedback Goal Goals Analytics Segment Segments Appcues Native Tools Tips 
+
+Tours Tips Modals Tool Tipcarousel Tooltips Walkthrough Walkme Guide Bridge  Module Pointzi StreetHawk TipsModals Paper onBoard  
+
+Tooltiptooltip   Tooltip
