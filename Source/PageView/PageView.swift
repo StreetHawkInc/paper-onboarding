@@ -70,7 +70,7 @@ extension PageView {
     view.addSubview(pageView)
     
     // add constraints
-    let layoutAttribs:[(NSLayoutAttribute, Int)] =  [(NSLayoutAttribute.left, 0), (NSLayoutAttribute.right, 0), (NSLayoutAttribute.bottom, Int(bottomConstant))]
+    let layoutAttribs:[(NSLayoutConstraint.Attribute, Int)] =  [(NSLayoutConstraint.Attribute.left, 0), (NSLayoutConstraint.Attribute.right, 0), (NSLayoutConstraint.Attribute.bottom, Int(bottomConstant))]
     for (attribute, const) in layoutAttribs {
         (view, pageView) >>>- {
             $0.constant  = CGFloat(const)
@@ -129,7 +129,7 @@ extension PageView {
     self.addSubview(container)
     
     // add constraints 
-    for attribute in [NSLayoutAttribute.top, NSLayoutAttribute.bottom] {
+    for attribute in [NSLayoutConstraint.Attribute.top, NSLayoutConstraint.Attribute.bottom] {
       (self, container) >>>- { $0.attribute = attribute; return }
     }
 
@@ -170,7 +170,7 @@ extension PageView {
     if animated == true {
       UIView.animate(withDuration: duration,
                                  delay: 0,
-                                 options: UIViewAnimationOptions(),
+                                 options: UIView.AnimationOptions(),
                                  animations: {
                                   self.layoutIfNeeded()
                                  },
