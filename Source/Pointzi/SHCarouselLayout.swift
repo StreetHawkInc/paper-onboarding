@@ -182,7 +182,7 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
         //must have this otherwise constraints cannot work
         viewCarousel.translatesAutoresizingMaskIntoConstraints = false
         self.viewCarouselContainer?.translatesAutoresizingMaskIntoConstraints = false
-        viewContent.sendSubview(toBack: viewCarousel)
+        viewContent.sendSubviewToBack(viewCarousel)
         let colorStr = dictCarousel["borderColor"] as? String
         let borderColor: UIColor? = SHCarouselLayout.color(from: colorStr)
         viewCarousel.layer.borderColor = borderColor?.cgColor

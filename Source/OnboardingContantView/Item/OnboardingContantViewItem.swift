@@ -77,14 +77,14 @@ extension OnboardingContentViewItem {
       return
     }
 
-    for attribute in [NSLayoutAttribute.leading, NSLayoutAttribute.trailing] {
+    for attribute in [NSLayoutConstraint.Attribute.leading, NSLayoutConstraint.Attribute.trailing] {
       (view, item) >>>- {
         $0.attribute = attribute
         return
       }
     }
     
-    for attribute in [NSLayoutAttribute.centerX, NSLayoutAttribute.centerY] {
+    for attribute in [NSLayoutConstraint.Attribute.centerX, NSLayoutConstraint.Attribute.centerY] {
       (view, item) >>>- {
         $0.attribute = attribute
         return
@@ -139,7 +139,7 @@ private extension OnboardingContentViewItem {
       return
     }
 
-    for (attribute, constant) in [(NSLayoutAttribute.leading, 10), (NSLayoutAttribute.trailing, -10)] {
+    for (attribute, constant) in [(NSLayoutConstraint.Attribute.leading, 10), (NSLayoutConstraint.Attribute.trailing, -10)] {
         (onView, label) >>>- {
             $0.attribute = attribute
             $0.constant  = CGFloat(constant)
@@ -164,7 +164,7 @@ private extension OnboardingContentViewItem {
       return
     }
 
-    for (attribute, constant) in [(NSLayoutAttribute.leading, 30), (NSLayoutAttribute.trailing, -30)] {
+    for (attribute, constant) in [(NSLayoutConstraint.Attribute.leading, 30), (NSLayoutConstraint.Attribute.trailing, -30)] {
       (onView, label) >>>- {
         $0.attribute = attribute
         $0.constant  = CGFloat(constant)
@@ -196,7 +196,7 @@ private extension OnboardingContentViewItem {
     onView.addSubview(imageView)
     
     // add constratints
-    for attribute in [NSLayoutAttribute.width, NSLayoutAttribute.height] {
+    for attribute in [NSLayoutConstraint.Attribute.width, NSLayoutConstraint.Attribute.height] {
       imageView >>>- {
         $0.attribute = attribute
         $0.constant  = 188
@@ -204,7 +204,7 @@ private extension OnboardingContentViewItem {
       }
     }
     
-    for attribute in [NSLayoutAttribute.centerX, NSLayoutAttribute.top] {
+    for attribute in [NSLayoutConstraint.Attribute.centerX, NSLayoutConstraint.Attribute.top] {
       (onView, imageView) >>>- { $0.attribute = attribute; return }
     }
     
