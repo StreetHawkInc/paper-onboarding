@@ -22,7 +22,7 @@ or use [CocoaPods](https://cocoapods.org) with Podfile:
 ``` ruby
 platform :ios, '8.0'
 
-use_frameworks! # This line is compulsory, as "paper-onboarding-pointzi" is a swift pod
+use_frameworks! # This line is compulsory, as "paper-onboarding-pointzi" since it is a swift pod
 
 target 'PointziDemo' do # Replace with your target if you have one
 
