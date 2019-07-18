@@ -3,7 +3,7 @@
 # paper-onboarding
 [![Twitter](https://img.shields.io/badge/Twitter-%40usepointzi-blue.svg)](https://twitter.com/usepointzi)
 
-## About
+## About Pointzi
 This project is maintained by Pointzi from the original creation by Ramotion Inc.<br>
 This fork of the popular Paper Onboarding carousel (or slider) allows you to update the images, design and content WITHOUT re-releasing the App.<br>
 
