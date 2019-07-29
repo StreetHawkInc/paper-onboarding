@@ -37,6 +37,7 @@ import UIKit
 
 extension OnboardingContentViewItem {
     @objc func prepareImage(notification: NSNotification) {
+    DispatchQueue.main.async {
         if (self.imageView?.image == nil) //if already has image, not need to check
         {
             //there is a image source for this item
@@ -47,12 +48,13 @@ extension OnboardingContentViewItem {
                     let imageSourceNotification = notification.userInfo!["source"] as! String
                     if (imageSource.compare(imageSourceNotification) == ComparisonResult.orderedSame)
                     {
-                        DispatchQueue.main.async {
+                        //DispatchQueue.main.async {
                             self.imageView?.image = notification.userInfo!["image"] as? UIImage
-                        }
+                        //}
                     }
                 }
             }
+          }
         }
     }
 }
