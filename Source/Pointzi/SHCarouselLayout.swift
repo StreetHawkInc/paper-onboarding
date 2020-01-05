@@ -372,7 +372,7 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
         let tipItem : NSDictionary = arrayItems[index] as! NSDictionary
         let dict = ["feed_id": self.dictCarousel?["feed_id"]!,
                     "result": 1,
-                    "step_id": tipItem["suid"]!,
+                    "step_id": index,
                     "delete": false,
                     "complete": false]
         NotificationCenter.default.post(name: NSNotification.Name("SH_PointziBridge_FeedResult_Notification"),
