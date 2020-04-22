@@ -21,6 +21,17 @@
 
 class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
 {
+    var result: Int = 0
+    var previousIndex = 0
+    
+    enum swipeDirection : Int {
+        case SHResult_Accept = 1
+        case SHResult_Decline = -1
+        case SHResult_Previous = 2
+        case SHResult_Next = 3
+        
+    }
+    
     func onboardingItemsCount() -> Int
     {
         let arrayItems = self.dictCarousel?["items"] as! NSArray
@@ -52,6 +63,18 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
     func onboardingWillTransitonToIndex(_ index: Int)
     {
         //Paper onboarding's animation is 0.5 duration, be consistent and looks good
+        
+        if index == onboardingItemsCount() - 1 {
+            result = swipeDirection.SHResult_Accept.rawValue
+        }
+        else if  index > previousIndex {
+            result = swipeDirection.SHResult_Next.rawValue
+        }
+        else {
+            result =  swipeDirection.SHResult_Previous.rawValue
+        }
+        
+        previousIndex = index
         UIView.animate(withDuration: 0.5, animations: {() -> Void in
             let arrayItems = self.dictCarousel?["items"] as! NSArray
             let tipItem : NSDictionary = arrayItems[index] as! NSDictionary
@@ -371,7 +394,7 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
         let arrayItems = self.dictCarousel?["items"] as! NSArray
         let tipItem : NSDictionary = arrayItems[index] as! NSDictionary
         let dict = ["feed_id": self.dictCarousel?["feed_id"]!,
-                    "result": 1,
+                    "result": result,
                     "step_id": index,
                     "delete": false,
                     "complete": false]
