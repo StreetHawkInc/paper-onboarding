@@ -26,6 +26,9 @@ class SHCarouselBridge : NSObject
         let viewContent = notification.userInfo!["view"] as! UIView
         //tip controller's content view
         let dictTip = notification.userInfo!["tip"] as! NSDictionary
+        let stepId  = notification.userInfo!["stepId"] as! NSString
+        SHCarouselLayout.sharedInstance.previousIndex = 0
+        SHCarouselLayout.sharedInstance.stepId = stepId as String
         SHCarouselLayout.sharedInstance.layoutCarousel(on: viewContent, forTip: dictTip)
     }
     
