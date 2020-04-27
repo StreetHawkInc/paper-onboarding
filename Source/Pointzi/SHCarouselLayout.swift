@@ -21,15 +21,16 @@
 
 class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
 {
-    var result: Int = 0
+    var result: Int = 4
     var previousIndex = 0
+    var stepId = "0"
     
     enum swipeDirection : Int {
         case SHResult_Accept = 1
         case SHResult_Decline = -1
         case SHResult_Previous = 2
         case SHResult_Next = 3
-        
+        case SHResult_Page_Change = 4
     }
     
     func onboardingItemsCount() -> Int
@@ -62,19 +63,7 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
     
     func onboardingWillTransitonToIndex(_ index: Int)
     {
-        //Paper onboarding's animation is 0.5 duration, be consistent and looks good
-        
-        if index == onboardingItemsCount() - 1 {
-            result = swipeDirection.SHResult_Accept.rawValue
-        }
-        else if  index > previousIndex {
-            result = swipeDirection.SHResult_Next.rawValue
-        }
-        else {
-            result =  swipeDirection.SHResult_Previous.rawValue
-        }
-        
-        previousIndex = index
+        result = swipeDirection.SHResult_Page_Change.rawValue
         UIView.animate(withDuration: 0.5, animations: {() -> Void in
             let arrayItems = self.dictCarousel?["items"] as! NSArray
             let tipItem : NSDictionary = arrayItems[index] as! NSDictionary
@@ -395,7 +384,7 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
         let tipItem : NSDictionary = arrayItems[index] as! NSDictionary
         let dict = ["feed_id": self.dictCarousel?["feed_id"]!,
                     "result": result,
-                    "step_id": index,
+                    "step_id": stepId,
                     "delete": false,
                     "complete": false]
         NotificationCenter.default.post(name: NSNotification.Name("SH_PointziBridge_FeedResult_Notification"),
