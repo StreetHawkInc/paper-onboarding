@@ -32,9 +32,20 @@ class SHCarouselBridge : NSObject
         SHCarouselLayout.sharedInstance.layoutCarousel(on: viewContent, forTip: dictTip)
     }
     
+    @objc class func nextCarousel(_ notification: Notification) {
+        let stepId  = notification.userInfo!["stepId"] as! NSString
+        let index  =  stepId.intValue
+        SHCarouselLayout.sharedInstance.viewOnboarding.currentIndex(Int(index), animated: true)
+       
+    }
+    
     @objc class func bridgeHandler(_ notification: Notification) {
         NotificationCenter.default.addObserver(self, selector: #selector(self.layoutCarouselHandler),
                                                name: NSNotification.Name(rawValue: "SH_CarouselBridge_LayoutCarousel"),
+                                               object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.nextCarousel),
+                                               name: NSNotification.Name(rawValue: "SH_CarouselBridge_Next"),
                                                object: nil)
     }
     
