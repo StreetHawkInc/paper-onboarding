@@ -24,6 +24,7 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
     var result: Int = 4
     var previousIndex = 0
     var stepId = "0"
+    var viewOnboarding: PaperOnboarding!
     
     enum swipeDirection : Int {
         case SHResult_Accept = 1
@@ -203,7 +204,7 @@ class SHCarouselLayout: PaperOnboardingDataSource, PaperOnboardingDelegate
         let cornerRadiusNum = dictCarousel["cornerRadius"] as? NSNumber
         let cornerRadius = CGFloat(Float((cornerRadiusNum?.floatValue)!))
         viewCarousel.layer.cornerRadius = cornerRadius
-        let viewOnboarding = PaperOnboarding(itemsCount: arrayItems.count)
+        viewOnboarding = PaperOnboarding(itemsCount: arrayItems.count)
         viewOnboarding.dataSource = self
         viewOnboarding.delegate = self
         viewOnboarding.translatesAutoresizingMaskIntoConstraints = false
